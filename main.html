@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>词霸（开发版）</title>
+    <link rel="stylesheet" href="./main.css">
+</head>
+<body>
+    <div class="main">
+
+        <!--左边栏-->
+        <div class="left">
+            <p class="title">词霸</p>
+            <div style="display: flex; flex-direction: row; justify-content: end; width: 95%;">
+                <p class="subtitle">——痛击你的生词！</p>
+            </div>
+            <div style="height: 30px;"></div>
+            <input type="text" placeholder="请输入你的单词" class="input-word" id="input-word">
+            <p class="hint">按下Enter以提交单词</p>
+            <p class="hint">或在输入框内Ctrl+V提交剪贴板</p>
+            <div style="height: 20px;"></div>
+            <div class="left-btn-grid">
+                <button type="button" class="left-buttons" id="clear" style="background-color: red;">清空列表</button>
+                <button type="button" class="left-buttons" id="save" style="background-color: lightgreen;">保存列表</button>
+            </div>
+        </div>
+
+        <!--弥补left绝对定位的宽度-->
+        <div style="width: 25%; height: 0px;"></div>
+
+        <!--词表部分-->
+        <div class="content">
+            <div style="height: 28px;"></div>
+            <table border="1" class="word-table" id="word-table">
+                <colgroup>
+                    <col style="width: 10%;">
+                    <col style="width: 13%;">
+                    <col style="width: 70%;">
+                    <col style="width: 7%;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th class="head">序号</th>
+                        <th class="head">单词</th>
+                        <th class="head">释义</th>
+                        <th class="head">操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div style="height: 28px;"></div>
+        </div>
+
+        <!--通知部分-->
+        <div class="notification" id="notification"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="./main.js"></script>
+</body>
+</html>

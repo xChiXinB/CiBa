@@ -1,0 +1,156 @@
+.main {
+    background-color: #0E1012;
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.left {
+    width: 25%;
+    height: 100vh;
+    background-color: #111519;
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.title {
+    font-size: 48px;
+    color: white;
+    margin: 10px;
+}
+
+.subtitle {
+    font-size: 24px;
+    color: white;
+    margin: 10px;
+}
+
+.input-word {
+    text-align: center;
+    font-size: 1.5vw;
+    border-radius: 5px;
+    width: 50%;
+    height: 4%;
+}
+
+.hint {
+    color: white;
+    margin: 5px;
+}
+
+.left-btn-grid {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    width: 80%;
+    min-height: 5%;
+    justify-items: center;
+}
+
+.left-buttons {
+    width: 85%;
+    min-height: 100%;
+    font-size: 1.7vw;
+    border-radius: 5px;
+}
+
+@keyframes zoom-in {
+    0% {transform: scale(1.0);}
+    100% {transform: scale(1.1);}
+}
+
+@keyframes zoom-out {
+    0% {transform: scale(1.1);}
+    100% {transform: scale(1.0);}
+}
+
+.content {
+    width: 75%;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+}
+
+.word-table {
+    width: 90%;
+    border-collapse: collapse;
+    padding: 12px;
+    animation: fade-in 0.5s ease;
+}
+
+.head {
+    background-color: #343A40;
+    color: white;
+}
+
+.word {
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 18px;
+}
+
+.operation {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0px;
+}
+
+.notification {
+    position: fixed;
+    right: 27.5%;
+    bottom: 20vh;
+    background-color: wheat;
+    height: 7vh;
+    width: 20%;
+    display: none;
+    border-radius: 5px;
+    border: #5C5343 3px solid;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-text {
+    color: black;
+    font-size: 18px;
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+}
+
+@keyframes opaquely-fade-in {
+    0% {opacity: 0;}
+    100% {opacity: 1;}
+}
