@@ -32,6 +32,10 @@ function input_word(information) {
     translation_input.className = 'translation-input';
     translation_input.value = '获取中……';
     translation_container.appendChild(translation_input);
+    translation_input.addEventListener('input', () => {
+        translation_input.style.height = '';
+        translation_input.style.height = `${translation_input.scrollHeight}px`;
+    });
     fetch(`http://localhost:50907/vocab/${new_word}`, {
         headers: {
             "Authorization": "Bearer abc123",
@@ -41,10 +45,13 @@ function input_word(information) {
             return res.text();
         })
         .then((translation) => {
-            new_row.cells[2].querySelector('textarea').value = translation;
+            translation_input.value = translation;
+            // 调整textarea高度
+            translation_input.dispatchEvent(new Event('input'));
         })
         .catch((e) => {
-            new_row.cells[2].querySelector('textarea').value = '未找到';
+            translation_input.value = '未找到';
+            translation_input.dispatchEvent(new Event('input'));
         });
     // 修改操作内容
     const operations_container = document.createElement('div');
@@ -55,7 +62,6 @@ function input_word(information) {
     to_delete.style.height = '18px';
     operations_container.appendChild(to_delete);
     // 创建按钮的事件监视器
-    // 绑定函数参数（避免addEventListener参数内频繁换行）
     delete_mouseover = information.callbacks.mouseover.bind(null, to_delete);
     delete_mouseleave = information.callbacks.mouseleave.bind(null, to_delete);
     delete_click = information.callbacks.delete_click.bind(null, to_delete);
@@ -214,8 +220,7 @@ function main() {
     save.addEventListener('click', () => {
         // 修改表格
         word_table.rows[0].cells[3].innerHTML = '';
-        debugger;
-        for (let i = 1; i < word_table.rows[0].length - 1; i++) {
+        for (let i = 1; i < word_table.rows.length; i++) {
             const translation = word_table.rows[i].cells[2].querySelector('textarea').value;
             word_table.rows[i].cells[2].querySelector('textarea').remove();
             word_table.rows[i].cells[2].innerHTML = translation;
