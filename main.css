@@ -131,14 +131,20 @@
     padding: 0px;
 }
 
-.notification {
+.notifications-container {
     position: fixed;
     right: 27.5%;
     bottom: 20vh;
-    background-color: wheat;
-    height: 7vh;
     width: 20%;
-    display: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.notification {
+    background-color: wheat;
+    min-height: 7vh;
+    width: 100%;
+    display: flex;
     border-radius: 5px;
     border: #5C5343 3px solid;
     flex-direction: row;

@@ -15,11 +15,21 @@ function input_word(information) {
     // return条件
     const input_box = document.getElementById('input-word');
     if (document.activeElement != input_box) {
-        return undefined;
+        return;
     }
     const new_word = input_box.value;
     if (new_word == '' ) {
-        return undefined;
+        return;
+    }
+    if (information.words.indexOf(new_word) != -1) {
+        notice([
+            {
+                type: 'text',
+                content: `${new_word}已添加过了！`,
+            },
+        ]);
+        input_box.value = '';
+        return;
     }
     // 新增一行表格
     const new_row = table({
@@ -59,6 +69,12 @@ function input_word(information) {
         .catch((e) => {
             translation_input.value = '未找到';
             translation_input.dispatchEvent(new Event('input'));
+            notice([
+                {
+                    type: 'text',
+                    content: `出现错误：${e}`,
+                },
+            ]);
         });
     // 修改操作内容
     const operations_container = document.createElement('div');
@@ -83,7 +99,7 @@ function input_word(information) {
 function table(operation) {
     /*
     * operation = {
-    *   method: 'insert' or 'delete' or 'edit',
+    *   method: 'insert' or 'delete',
     *   index: int,
     * }
     * 增加或删除词表
@@ -102,6 +118,14 @@ function table(operation) {
             new_row.style.animation = 'opaquely-fade-in 0.5s ease';
             return new_row;
         case 'delete':
+            const word = word_table.rows[operation.index].cells[1].innerHTML;
+            console.log(word);
+            notice([
+                {
+                    type: 'text',
+                    content: `已删除单词 ${word} ！`,
+                },
+            ]);
             word_table.deleteRow(operation.index);
             for (let i = operation.index; i < word_table.rows.length; i++) {
                 word_table.rows[i].cells[0].innerHTML = i;
@@ -123,8 +147,9 @@ function notice(components) {
     *   }, more...
     * ]
     */
-    const notification = document.getElementById('notification');
-    notification.style.display = 'flex';
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    document.getElementById('notifications-container').appendChild(notification);
     notification.style.animation = 'fade-in 0.5s ease';
     // 遍历通知成分
     for (let i = 0; i < components.length; i++) {
@@ -155,7 +180,7 @@ function notice(components) {
     }, 5000);
     // 5.5秒后隐藏通知
     setTimeout(() => {
-        notification.style.display = 'none';
+        notification.remove();
     }, 5500);
 }
 
@@ -233,29 +258,31 @@ function main() {
             word_table.rows[i].cells[2].innerHTML = translation;
         }
         const workbook = XLSX.utils.table_to_book(word_table);
-        XLSX.writeFile(workbook, `生词记录${new Date()}.xlsx`);
+        const name = `生词记录${new Date()}.xlsx`;
+        XLSX.writeFile(workbook, name);
+        notice([
+            {
+                type: 'text',
+                content: '已保存表格到本地！',
+            },
+        ]);
+        word_table.rows[0].cells[3].innerHTML = '操作';
+        clear.dispatchEvent(new Event('click'));
+    });
+    // 清空按钮功能
+    clear.addEventListener('click', () => {
+        // 注意删除过程中表格的动态变化
+        const length = word_table.rows.length;
+        for (let i = 1; i < length; i++) {
+            word_table.deleteRow(1);
+        }
+        notice([
+            {
+                type: 'text',
+                content: '已清空表格！',
+            },
+        ]);
     });
 };
 
 main();
-
-// test
-/*
-notice(
-    [
-        {
-            type: 'text',
-            content: 'test&nbsp;',
-            callback: null,
-        },
-        {
-            type: 'event',
-            content: 'click me',
-            callback: () => {
-                console.log('being clicked');
-                console.log(this);
-            },
-        },
-    ]
-);
-*/
