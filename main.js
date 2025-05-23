@@ -7,12 +7,14 @@
 * 4：Ctrl+C监听，输入剪贴板单词。
 */
 
-function input_word(new_word) {
+function input_word(information) {
     /*
     * 1. 查询单词释义
     * 2. 增加表格内容
     */
     // 新增一行表格
+    const input_box = document.getElementById('input-word');
+    const new_word = input_box.value;
     const new_row = table({
         method: 'insert',
         index: -1,
@@ -22,7 +24,14 @@ function input_word(new_word) {
     // 修改单词内容
     new_row.cells[1].innerHTML = new_word;
     // 访问Python服务器，修改释义内容
-    new_row.cells[2].innerHTML = '获取中……';
+    // 创建释义输入框
+    const translation_container = document.createElement('div');
+    translation_container.className = 'translation-container';
+    new_row.cells[2].appendChild(translation_container);
+    const translation_input = document.createElement('textarea');
+    translation_input.className = 'translation-input';
+    translation_input.value = '获取中……';
+    translation_container.appendChild(translation_input);
     fetch(`http://localhost:50907/vocab/${new_word}`, {
         headers: {
             "Authorization": "Bearer abc123",
@@ -32,74 +41,30 @@ function input_word(new_word) {
             return res.text();
         })
         .then((translation) => {
-            new_row.cells[2].innerHTML = translation;
+            new_row.cells[2].querySelector('textarea').value = translation;
         })
         .catch((e) => {
-            new_row.cells[2].innerHTML = '未找到';
+            new_row.cells[2].querySelector('textarea').value = '未找到';
         });
     // 修改操作内容
-    // 删除表格边距
-    new_row.cells[3].style.padding = 0;
-    // 创建外部框架
-    const border = document.createElement('div');
-    border.className = 'operation';
-    new_row.cells[3].appendChild(border);
-    // 创建框架内的图标和中间的空隙
-    const to_edit = document.createElement('img');
-    const gap = document.createElement('div');
+    const operations_container = document.createElement('div');
+    operations_container.className = 'operations-container';
+    new_row.cells[3].appendChild(operations_container);
     const to_delete = document.createElement('img');
-    to_edit.src = './images/edit.png';
     to_delete.src = './images/delete.png';
-    to_edit.style.height = to_delete.style.height = '18px';
-    gap.style.width = '6px';
-    border.appendChild(to_edit);
-    border.appendChild(gap);
-    border.appendChild(to_delete);
+    to_delete.style.height = '18px';
+    operations_container.appendChild(to_delete);
     // 创建按钮的事件监视器
-    let buttons = {
-        'to_edit': to_edit,
-        'to_delete': to_delete,
-    };
-    let callbacks = new Object();
-    for (let button in buttons) {
-        callbacks[button] = new Object();
-        callbacks[button].click = () => {
-            table({
-                method: 'delete',
-                index: new_row.rowIndex,
-            });
-        };
-        callbacks[button].mouseover = () => {
-            buttons[button].style.backgroundColor = '#2B3640';
-        };
-        callbacks[button].mouseleave = () => {
-            buttons[button].style.backgroundColor = 'none';
-        };
-    }
-    console.log(callbacks);
-    /*
-    const delete_click_callback = () => {
-        table({
-            method: 'delete',
-            index: new_row.rowIndex,
-        });
-        to_delete.removeEventListener()
-    };
-    const delete_mouseover_callback = () => {
-        to_delete.style.backgroundColor = '#2B3640';
-    }
-    const delete_mouseleave_callback = () => {
-        to_delete.style.backgroundColor = 'none';
-    }
-    const edit_mouseover_callback = () => {
-        to_edit.style.backgroundColor = '#2B3640';
-    }
-    const edit_mouseleave_callback = () => {
-        to_edit.style.backgroundColor = 'none';
-    }
-    to_delete.addEventListener('click', delete_click_callback, {once: true});
-    to_delete.addEventListener('mouseover', delete_click_callback);
-    to_delete.addEventListener('click', delete_click_callback, {once: true});*/
+    // 绑定函数参数（避免addEventListener参数内频繁换行）
+    delete_mouseover = information.callbacks.mouseover.bind(null, to_delete);
+    delete_mouseleave = information.callbacks.mouseleave.bind(null, to_delete);
+    delete_click = information.callbacks.delete_click.bind(null, to_delete);
+    to_delete.addEventListener('mouseover', delete_mouseover);
+    to_delete.addEventListener('mouseleave', delete_mouseleave);
+    to_delete.addEventListener('click', delete_click);
+    // 收尾工作
+    information.words.push(new_word);
+    input_box.value = '';
 }
 
 function table(operation) {
@@ -119,7 +84,7 @@ function table(operation) {
         case 'insert':
             const new_row = word_table.tBodies[0].insertRow(operation.index);
             for (let i = 0; i < 4 ; i++) { // i < 4 因为表格只有四列
-                new_row.insertCell(i).className = 'word';
+                new_row.insertCell(i).className = 'table-data';
             }
             new_row.style.animation = 'opaquely-fade-in 0.5s ease';
             return new_row;
@@ -129,8 +94,6 @@ function table(operation) {
                 word_table.rows[i].cells[0].innerHTML = i;
             }
             return;
-        case 'edit':
-
         default:
             throw new ReferenceError(`方法${operation.method}未被定义！`);
             return;
@@ -187,20 +150,35 @@ function main() {
     const word_table = document.getElementById('word-table');
     const clear = document.getElementById('clear');
     const save = document.getElementById('save');
-    const input_box = document.getElementById('input-word');
-    let words = new Array();
+    const information = {
+        words: [],
+        callbacks: {
+            mouseover: (element) => {
+                element.src = `${element.src.slice(0, -4)}_over.png`;
+            },
+            mouseleave: (element) => {
+                element.src = `${element.src.slice(0, -9)}.png`; // 裁掉_over字段
+            },
+            delete_click: (element) => {
+                // 需要从图片元素开始，找到自己所在行的索引
+                const index = element.closest('tr').rowIndex;
+                table({
+                    method: 'delete',
+                    index: index,
+                });
+                information.words.splice(index - 1, 1); // 删除第index-1个单词
+                console.log(information);
+            },
+        },
+    };
     // 监听Enter键和Ctrl+V
     document.addEventListener('keydown', (res) => {
         if (res.key == 'Enter') {
-            input_word(input_box.value);
-            words.push(input_box.value);
-            input_box.value = '';
+            input_word(information);
         }
         if (res.ctrlKey && res.key == 'v') {
             setTimeout(() => {
-                input_word(input_box.value);
-                words.push(input_box.value);
-                input_box.value = '';
+                input_word(information);
             }, 10);
         }
     });
@@ -234,6 +212,14 @@ function main() {
     }, 100);
     // 保存按钮功能
     save.addEventListener('click', () => {
+        // 修改表格
+        word_table.rows[0].cells[3].innerHTML = '';
+        debugger;
+        for (let i = 1; i < word_table.rows[0].length - 1; i++) {
+            const translation = word_table.rows[i].cells[2].querySelector('textarea').value;
+            word_table.rows[i].cells[2].querySelector('textarea').remove();
+            word_table.rows[i].cells[2].innerHTML = translation;
+        }
         const workbook = XLSX.utils.table_to_book(word_table);
         XLSX.writeFile(workbook, `生词记录${new Date()}.xlsx`);
     });
@@ -255,6 +241,7 @@ notice(
             content: 'click me',
             callback: () => {
                 console.log('being clicked');
+                console.log(this);
             },
         },
     ]

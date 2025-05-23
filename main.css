@@ -95,14 +95,35 @@
     color: white;
 }
 
-.word {
+.translation-input {
+    color: white;
+    font-size: 18px;
+    width: 97%;
+    height: 18px;
+    background-color: #0E1012;
+    overflow: hidden;
+    resize: none;
+    border: none;
+}
+
+.table-data {
     color: white;
     text-align: center;
     vertical-align: middle;
     font-size: 18px;
+    padding: 0px;
 }
 
-.operation {
+.translation-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.operations-container {
     display: flex;
     flex-direction: row;
     align-items: center;

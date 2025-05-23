@@ -26,4 +26,4 @@ def get_translation(vocab):
 
     return translation
 
-app.run(debug=True, host='0.0.0.0', port=50907)
+app.run(debug=True, host='localhost', port=50907)
