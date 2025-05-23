@@ -12,9 +12,16 @@ function input_word(information) {
     * 1. 查询单词释义
     * 2. 增加表格内容
     */
-    // 新增一行表格
+    // return条件
     const input_box = document.getElementById('input-word');
+    if (document.activeElement != input_box) {
+        return undefined;
+    }
     const new_word = input_box.value;
+    if (new_word == '' ) {
+        return undefined;
+    }
+    // 新增一行表格
     const new_row = table({
         method: 'insert',
         index: -1,
