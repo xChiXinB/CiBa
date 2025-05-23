@@ -81,7 +81,7 @@ function input_word(information) {
     operations_container.className = 'operations-container';
     new_row.cells[3].appendChild(operations_container);
     const to_delete = document.createElement('img');
-    to_delete.src = './images/delete.png';
+    to_delete.src = './static/images/delete.png';
     to_delete.style.height = '18px';
     operations_container.appendChild(to_delete);
     // 创建按钮的事件监视器

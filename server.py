@@ -26,4 +26,8 @@ def get_translation(vocab):
 
     return translation
 
+@app.route('/home')
+def home():
+    return flask.render_template("main.html")
+
 app.run(debug=True, host='localhost', port=50907)
