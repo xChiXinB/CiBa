@@ -2,18 +2,16 @@
 <html>
 <head>
     <meta charset="UTF-8"/>
-    <title>词霸（开发版）</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <title>词霸（开发版）：录入单词</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon-32x32.png') }}"
 </head>
 <body>
     <div class="main">
 
         <!--左边栏-->
         <div class="left">
-            <p class="title">词霸</p>
-            <div style="display: flex; flex-direction: row; justify-content: end; width: 95%;">
-                <p class="subtitle">——痛击你的生词！</p>
-            </div>
+            <p class="title">录入单词</p>
             <div style="height: 30px;"></div>
             <input type="text" placeholder="请输入你的单词" class="input-word" id="input-word">
             <p class="hint">按下Enter以提交单词</p>
@@ -22,6 +20,8 @@
             <div class="left-btn-grid">
                 <button type="button" class="left-buttons" id="clear" style="background-color: red;">清空列表</button>
                 <button type="button" class="left-buttons" id="save" style="background-color: lightgreen;">保存列表</button>
+                <button type="button" class="left-buttons" style="background-color: gold;">智能录入</button>
+                <button type="button" class="left-buttons" style="background-color: cyan;">开始背诵</button>
             </div>
         </div>
 
@@ -56,6 +56,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script src="{{ url_for('static', filename='input.js') }}"></script>
 </body>
 </html>

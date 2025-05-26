@@ -30,12 +30,6 @@
     margin: 10px;
 }
 
-.subtitle {
-    font-size: 24px;
-    color: white;
-    margin: 10px;
-}
-
 .input-word {
     text-align: center;
     font-size: 1.5vw;
@@ -52,14 +46,14 @@
 .left-btn-grid {
     display: grid;
     grid-template-columns: 50% 50%;
+    grid-template-rows: 7vh 7vh;
     width: 80%;
-    min-height: 5%;
     justify-items: center;
 }
 
 .left-buttons {
     width: 85%;
-    min-height: 100%;
+    height: 5vh;
     font-size: 1.7vw;
     border-radius: 5px;
 }
