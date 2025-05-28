@@ -42,8 +42,8 @@ def get_translation(vocab):
         if text[0:2] != '网络':
             response += f'{text}\n'
     response = response[0:-1]
-
     edge_driver.quit()
+    
     return response
 
 @app.route('/input')

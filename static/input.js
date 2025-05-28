@@ -53,7 +53,7 @@ function input_word(information) {
         translation_input.style.height = '';
         translation_input.style.height = `${translation_input.scrollHeight}px`;
     });
-    fetch(`http://localhost:50907/vocab/${new_word}`, {
+    fetch(`http://${location.host}/vocab/${new_word}`, {
         headers: {
             "Authorization": "Bearer abc123",
         }
