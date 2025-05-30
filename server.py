@@ -39,7 +39,7 @@ def get_translation(vocab):
     response = ''
     for _ in li:
         text = _.get_text()
-        if text[0:2] != '网络':
+        if text[0:2] != '网络': # 剔除网络释义
             response += f'{text}\n'
     response = response[0:-1]
     edge_driver.quit()
@@ -50,4 +50,4 @@ def get_translation(vocab):
 def home():
     return flask.render_template("input.html")
 
-app.run(debug=True, host='0.0.0.0', port=50907)
+app.run(host='0.0.0.0', port=50907)
