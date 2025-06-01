@@ -18,6 +18,7 @@ def get_translation(vocab):
     options = Options()
     options.add_argument('--user-agent=Mozilla/...Edge/136...')
     edge_driver = selenium.webdriver.Edge()
+    edge_driver.minimize_window()
 
     # 操作浏览器
     edge_driver.get(url='https://cn.bing.com/dict/')
