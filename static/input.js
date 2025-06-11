@@ -15,13 +15,16 @@ function input_word(information) {
     // return条件
     const input_box = document.getElementById('input-word');
     if (document.activeElement != input_box) {
+        // 焦点不在输入框
         return;
     }
     const new_word = input_box.value;
     if (new_word == '' ) {
+        // 输入为空
         return;
     }
     if (information.words.indexOf(new_word) != -1) {
+        // 输入重复
         notice([
             {
                 type: 'text',
@@ -29,6 +32,18 @@ function input_word(information) {
             },
         ]);
         input_box.value = '';
+        return;
+    }
+    const word_table = document.getElementById('word-table');
+    const latest_input_time = parseInt(word_table.rows[word_table.rows.length - 1].id);
+    if (Date.now() - latest_input_time <= 2000) {
+        // 两次单词输入间隔小于2秒
+        notice([
+            {
+                type: 'text',
+                content: '操作过于频繁，请稍后再试。',
+            },
+        ]);
         return;
     }
     // 新增一行表格
@@ -114,8 +129,13 @@ function table(operation) {
             const new_row = word_table.tBodies[0].insertRow(operation.index);
             for (let i = 0; i < 4 ; i++) { // i < 4 因为表格只有四列
                 new_row.insertCell(i).className = 'table-data';
+                new_row.id = Date.now()
             }
             new_row.style.animation = 'opaquely-fade-in 0.5s ease';
+            new_row.scrollIntoView({
+                behavior: 'smooth',
+                block: 'end',
+            });
             return new_row;
         case 'delete':
             const word = word_table.rows[operation.index].cells[1].innerHTML;
@@ -185,6 +205,7 @@ function notice(components) {
 }
 
 function main() {
+    // 初始化
     const word_table = document.getElementById('word-table');
     const clear = document.getElementById('clear');
     const save = document.getElementById('save');
@@ -209,16 +230,30 @@ function main() {
             },
         },
     };
+
     // 监听Enter键和Ctrl+V
     document.addEventListener('keydown', (res) => {
         if (res.key == 'Enter') {
             input_word(information);
         }
-        if (res.ctrlKey && res.key == 'v') {
+        if ((res.ctrlKey || res.metaKey) && res.key == 'v') {
             setTimeout(() => {
                 input_word(information);
             }, 10);
         }
+    });
+    // 监听窗口变动
+    let timeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            for (let i = 1; i < word_table.rows.length; i++) {
+                word_table.rows[i].cells[2]
+                .querySelector('.translation-container')
+                .querySelector('.translation-input')
+                .dispatchEvent(new Event('input'));
+            }
+        }, 250);
     });
     // 按钮覆盖动画
     const zoom_in = (element) => {
