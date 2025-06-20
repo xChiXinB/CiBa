@@ -125,6 +125,11 @@
     padding: 0px;
 }
 
+.operations {
+    height: 18px;
+    width: 18px;
+}
+
 .notifications-container {
     position: fixed;
     right: 27.5%;
