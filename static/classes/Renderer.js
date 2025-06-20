@@ -92,17 +92,31 @@ class Renderer {
     }
 
     addTranslation(row, translation) {
-        // 补充翻译的信息
-        row // 这一行
+        const translation_textarea = row // 这一行
         .cells[2] // 的第二列
         .querySelector('.translation-container') // 的外容器
-        .querySelector('.translation-input') // 的输入框
-        .value = translation; // 的值
+        .querySelector('.translation-input'); // 的输入框
+        // 补充翻译的信息
+        translation_textarea.value = translation; // 的值
         // 将行滚动到视图
-        row.scrollIntoView({
+        translation_textarea.scrollIntoView({
             behavior: 'smooth',
             block: 'end',
         });
+        // 调整行高
+        translation_textarea.dispatchEvent(new Event('input'));
+    }
+
+    removeIndex(row_index) {
+        // 删除表格
+        this.table.deleteRow(row_index);
+        // 如果不剩单词，就禁用所有按钮
+        if (this.table.rows.length === 1) {
+            this.disableAllBtn();
+        // 如果还剩单词，就尝试恢复保存按钮
+        } else {
+            this.tryEnableSaveBtn();
+        }
     }
 
     notify(message) {

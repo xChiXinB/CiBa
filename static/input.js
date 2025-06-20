@@ -33,7 +33,7 @@ class Main {
     run() {
         // 监听提交单词行为
         console.log('Running in progress!');
-        this.ueh.listenSubmit(this.dm, this.r, this.nm);
+        this.ueh.vocabSubmitService(this.dm, this.r, this.nm);
     }
 }
 
@@ -291,7 +291,7 @@ main();
 //         notification.remove();
 //     }, 5500);
 // }
-
+/* */
 // function main() {
 //     // 初始化
 //     const word_table = document.getElementById('word-table');
@@ -334,7 +334,7 @@ main();
 //             },
 //         },
 //     }; // 传递变量
-
+/* */
 //     // 监听Enter键和Ctrl+V
 //     document.addEventListener('keydown', (res) => {
 //         if (res.key == 'Enter') {

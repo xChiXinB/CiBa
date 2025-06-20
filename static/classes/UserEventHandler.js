@@ -3,7 +3,7 @@ class UserEventHandler {
         this.input_box = document.getElementById('input-box');
     }
 
-    listenSubmit(DataManager, Renderer, NetworkManager) {
+    vocabSubmitService(DataManager, Renderer, NetworkManager) {
         // 监听提交单词行为
         this.listenShortcuts(DataManager, Renderer, NetworkManager);
         this.listenEnterKey(DataManager, Renderer, NetworkManager);
@@ -49,7 +49,7 @@ class UserEventHandler {
             // 新增一行表格，并获取返回的行和删除按钮的引用
             const { new_row, delete_btn } = Renderer.insertCompleteRow(new_vocabulary);
             // 监听删除按钮
-            this.listenDeleteBtn(delete_btn);
+            this.listenDeleteBtn(delete_btn, DataManager, Renderer);
             // 清空输入框
             this.input_box.value = '';
             // fetch释义数据
@@ -95,9 +95,28 @@ class UserEventHandler {
         return new_vocabulary;
     }
 
-    listenDeleteBtn(button) {
+    listenDeleteBtn(button, DataManager, Renderer) {
         // 绑定删除按钮的事件监视器
-        
+        // 鼠标覆盖
+        button.addEventListener('mouseover', () => {
+            button.src = `${button.src.slice(0, -4)}_over.png`;
+            // 先去掉'.png'字段，再加入'_over.png'
+        });
+        // 鼠标离开
+        button.addEventListener('mouseleave', () => {
+            button.src = `${button.src.slice(0, -9)}.png`
+            // 先去掉'_over.png'字段，再加入'.png'
+        });
+        // 鼠标点击
+        button.addEventListener('click', () => {
+            // 获取单词和单词索引
+            const row_index = button.closest('tr').rowIndex;
+            const vocab = button.closest('tr').cells[1].textContent;
+            // 删除数据
+            delete DataManager.vocabulary[vocab];
+            // 删除表格该行
+            Renderer.removeIndex(row_index);
+        })
     }
 }
 
