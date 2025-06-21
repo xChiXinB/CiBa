@@ -15,7 +15,7 @@
 
 ## 环境建议
 - Python 3.11+ （推荐使用新版本）
-- Python依赖库：`pip install flask requests bs4`
+- Python依赖库：`pip install flask bs4 selenium`
 
 ## 运行操作
 
@@ -29,4 +29,4 @@
 
 ### 第三步：访问本地服务器
 
-浏览器输入`localhost:50907/home`（或你自己设置的端口号）即可使用！
+浏览器输入`localhost:50907/input`（或你自己设置的端口号）即可使用！
