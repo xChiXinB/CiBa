@@ -1,12 +1,66 @@
 class UserEventHandler {
     constructor() {
         this.input_box = document.getElementById('input-box');
+        this.table = document.getElementById('word-table');
+        this.clear = document.getElementById('clear');
+        this.save = document.getElementById('save');
     }
 
     vocabSubmitService(DataManager, Renderer, NetworkManager) {
         // 监听提交单词行为
         this.listenShortcuts(DataManager, Renderer, NetworkManager);
         this.listenEnterKey(DataManager, Renderer, NetworkManager);
+    }
+
+    buttonServices(DataManager, Renderer) {
+        // 监听保存和清空按钮
+        this.save.addEventListener('click', () => {
+            this.btnSave(DataManager, Renderer);
+        });
+        this.clear.addEventListener('click', () => {
+            this.btnClear(DataManager, Renderer);
+        });
+    }
+
+    btnSave(DataManager, Renderer) {
+        // 保存表格
+        // 1. 移除冗余的内容
+        this.table.rows[0].cells[3].textContent = ''; // 移除“操作”
+        for (let i = 1; i < this.table.rows.length; i++) {
+            const textarea = this.table
+                .rows[i].cells[2]
+                .querySelector('.translation-input');
+            const translation = textarea.value;
+            textarea.remove(); // 移除输入框
+            this.table
+                .rows[i].cells[2]
+                .textContent = translation;
+        }
+        // 2. 利用第三方库导出表格
+        const workbook = XLSX.utils.table_to_book(this.table);
+        const name = `生词记录 ${new Date().toString()}.xlsx`;
+        XLSX.writeFile(workbook, name);
+        // 3. 提醒用户导出成功
+        Renderer.notify('已保存表格到本地！');
+        // 4. 清空表格
+        this.btnClear(DataManager, Renderer);
+        // 5. 补回“操作”
+        this.table.rows[0].cells[3].textContent = '操作';
+    }
+
+    btnClear(DataManager, Renderer) {
+        // 清空表格
+        // 1. 删除，然后放置新的tbody
+        document.getElementById('word-tbody').remove();
+        const tbody = document.createElement('tbody');
+        tbody.id = 'word-tbody';
+        this.table.appendChild(tbody);
+        // 2. 清空DataManager的数据
+        DataManager.vocabulary = {};
+        // 3. 禁用所有按钮
+        Renderer.disableAllBtn();
+        // 4. 通知用户
+        Renderer.notify('表格已被清空！');
     }
 
     listenShortcuts(DataManager, Renderer, NetworkManager) {
@@ -62,8 +116,10 @@ class UserEventHandler {
                 // 失败后展示“出现错误”
                 Renderer.addTranslation(new_row, '出现错误！');
             } finally {
-                // 更新单词数据（查询完毕，true）
-                DataManager.vocabulary[new_vocabulary] = true;
+                // 如果单词没被删，更新单词数据（true）
+                if (DataManager.vocabulary[new_vocabulary] !== undefined) {
+                    DataManager.vocabulary[new_vocabulary] = true;
+                }
                 // 尝试解禁按钮
                 Renderer.tryEnableSaveBtn(DataManager);
             }
@@ -84,6 +140,24 @@ class UserEventHandler {
         // 输入重复
         if (DataManager.vocabulary[new_vocabulary] !== undefined) {
             this.input_box.value = ''; // 清空输入框
+            // 获取单词释义并通知用户
+            const translation = this.table.rows[
+                // 获取单词索引
+                Object
+                    .keys(DataManager.vocabulary)
+                    .indexOf(new_vocabulary) + 1
+            ]
+                .cells[2]
+                .querySelector('.translation-input')
+                .value;
+            Renderer.notify(
+                `${new_vocabulary}重复！释义：
+                ${translation.length > 10?
+                    `${translation.slice(0, 10)}...`:
+                    translation
+                }`
+            );
+            console.log(Object.keys(DataManager.vocabulary).indexOf(new_vocabulary));
             return false;
         }
         // 输入过于频繁（小于2秒）
@@ -115,8 +189,10 @@ class UserEventHandler {
             // 删除数据
             delete DataManager.vocabulary[vocab];
             // 删除表格该行
-            Renderer.removeIndex(row_index);
-        })
+            Renderer.removeIndex(row_index, DataManager);
+            // 通知用户
+            Renderer.notify(`已删除${vocab}。`);
+        });
     }
 }
 

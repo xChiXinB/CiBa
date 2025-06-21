@@ -6,6 +6,46 @@ class Renderer {
         this.save = document.getElementById('save');
         this.table = document.getElementById('word-table');
         this.notifications_container = document.getElementById('notifications-container');
+        // 用于translationAutoHeight
+        this.auto_height_timeout = undefined;
+        // 用于btnHoverAnim
+        this.mouseover = (element) => {
+            element.style.animation = 'zoom-in 0.5s ease'
+            setTimeout(() => {
+                element.style.transform = 'scale(1.1)';
+            }, 490); // 延迟比动画少10ms是为了解决按钮大小抽搐
+        };
+        this.mouseleave = (element) => {
+            element.style.animation = 'zoom-out 0.5s ease'
+            setTimeout(() => {
+                element.style.transform = 'scale(1.0)';
+            }, 490);
+        };
+    }
+
+    translationAutoHeight() {
+        // 监听窗口变动，并时刻调整翻译textarea的高度
+        window.addEventListener('resize', () => {
+            // 如果resize过于频繁，就不会更改高度
+            clearTimeout(this.auto_height_timeout);
+            this.auto_height_timeout = setTimeout(() => {
+                // 遍历table，给其中的每一个textarea加上input事件
+                for (let i = 1; i < this.table.rows.length; i++) {
+                    this.table
+                        .rows[i].cells[2]
+                        .querySelector('.translation-input')
+                        .dispatchEvent(new Event('input'));
+                }
+            }, 250); // resize不再触发250ms后，更改高度
+        });
+    }
+
+    btnHoverAnim() {
+        // 加载按钮的悬停动画
+        this.clear.addEventListener('mouseover', () => {this.mouseover(this.clear);});
+        this.clear.addEventListener('mouseleave', () => {this.mouseleave(this.clear);});
+        this.save.addEventListener('mouseover', () => {this.mouseover(this.save);});
+        this.save.addEventListener('mouseleave', () => {this.mouseleave(this.save);});
     }
 
     disableAllBtn() {
@@ -44,6 +84,7 @@ class Renderer {
             const cell = new_row.insertCell(-1);
             cell.className = 'table-data';
         }
+        // 加入表格细节
         const { delete_btn } = this.modifyRow(new_row, new_vocabulary);
         return {
             new_row: new_row,
@@ -92,30 +133,30 @@ class Renderer {
     }
 
     addTranslation(row, translation) {
+        // 补充单词的翻译信息
         const translation_textarea = row // 这一行
         .cells[2] // 的第二列
-        .querySelector('.translation-container') // 的外容器
         .querySelector('.translation-input'); // 的输入框
         // 补充翻译的信息
         translation_textarea.value = translation; // 的值
+        // 调整行高
+        translation_textarea.dispatchEvent(new Event('input'));
         // 将行滚动到视图
         translation_textarea.scrollIntoView({
             behavior: 'smooth',
             block: 'end',
         });
-        // 调整行高
-        translation_textarea.dispatchEvent(new Event('input'));
     }
 
-    removeIndex(row_index) {
-        // 删除表格
+    removeIndex(row_index, DataManager) {
+        // 删除表格的某一行
         this.table.deleteRow(row_index);
         // 如果不剩单词，就禁用所有按钮
         if (this.table.rows.length === 1) {
             this.disableAllBtn();
         // 如果还剩单词，就尝试恢复保存按钮
         } else {
-            this.tryEnableSaveBtn();
+            this.tryEnableSaveBtn(DataManager);
         }
     }
 

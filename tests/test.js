@@ -1,6 +1,11 @@
-const obj = { value: 1 };
-console.log('before change', obj);
+const condition = false;
 
-obj.value = 2;
+(condition?
+    (() => {
+        console.log('true');
+    }):
+    (() => {
+        console.log('false');
+    }))();
 
-console.log('after change', obj);
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
