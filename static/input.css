@@ -144,8 +144,9 @@
     min-height: 7vh;
     width: 100%;
     display: flex;
-    border-radius: 5px;
+    border-radius: 8px;
     border: #5C5343 3px solid;
+    opacity: 0.7;
     flex-direction: row;
     align-items: center;
     justify-content: center;
@@ -162,14 +163,14 @@
         transform: translateY(40px);
     }
     100% {
-        opacity: 1;
+        opacity: 0.7;
         transform: translateY(0px);
     }
 }
 
 @keyframes fade-out {
     0% {
-        opacity: 1;
+        opacity: initial;
         transform: translateY(0px);
     }
     100% {

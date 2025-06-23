@@ -173,14 +173,20 @@ class Renderer {
         const paragraph = document.createElement('p');
         paragraph.textContent = message.toString();
         single_notification.appendChild(paragraph);
-        // 延迟5秒，播放出场动画
-        setTimeout(() => {
-            single_notification.style.animation = 'fade-out 0.5s ease';
-            // 再延迟0.5秒，删除通知
-            setTimeout(() => {
-                single_notification.remove();
-            }, 500);
-        }, 5000);
+        // // 延迟5秒，播放出场动画
+        // setTimeout(() => {
+        //     single_notification.style.animation = 'fade-out 0.5s ease';
+        //     // 再延迟0.5秒，删除通知和缝隙
+        //     setTimeout(() => {
+        //         single_notification.remove();
+        //         gap.remove();
+        //     }, 500);
+        // }, 5000);
+
+        // 创建通知之间的18px间隙
+        const gap = document.createElement('div');
+        gap.style.height = '8px';
+        this.notifications_container.appendChild(gap);
     }
 }
 
