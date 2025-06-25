@@ -152,9 +152,9 @@ class UserEventHandler {
                 .value;
             Renderer.notify(
                 `${new_vocabulary}重复！释义：
-                ${translation.length > 10?
-                    `${translation.slice(0, 10)}...`:
-                    translation
+                ${translation.length > 10
+                    ? `${translation.slice(0, 10)}...`
+                    : translation
                 }`
             );
             console.log(Object.keys(DataManager.vocabulary).indexOf(new_vocabulary));

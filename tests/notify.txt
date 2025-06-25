@@ -1,0 +1,25 @@
+预期的表现：
+远古通知上隐（增加性能：opacity=0以后直接remove）
+新通知出现后，旧通知丝滑上移
+
+实现（伪代码）：
+define notify:
+	add a new notification display
+
+	define x as (get all notification displays as a list)
+	for each of the item, as notification, in x:
+		if index of notification in x is biggest // technically, equals to x's length minus one
+			add an upward moving animation, lasting 500 ms
+			add an increasing opacity animation, lasting 500 ms
+			set a timeout, execute
+				add a leaving animation, then
+				remove notification
+			after 5000 ms
+		else
+			decrease notification's opacity
+			if notification's opacity is zero:
+				add notification into remove list
+			else
+				add an upward moving animation, lasting 500 ms
+
+	remove all notifications in remove list 

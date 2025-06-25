@@ -21,6 +21,8 @@ class Renderer {
                 element.style.transform = 'scale(1.0)';
             }, 490);
         };
+        // 用于管理动画
+        this.notifications = [];
     }
 
     translationAutoHeight() {
@@ -162,31 +164,159 @@ class Renderer {
 
     notify(message) {
         // 向用户弹出通知
+        /*	伪代码
+        add a new notification display
+	
+        define x as (get all notification displays as a list)
+        for each of the item, as notification, in x:
+            if index of notification in x is biggest // technically, equals to x's length minus one
+                add an upward moving animation, lasting 500 ms
+                add an increasing opacity animation, lasting 500 ms
+                set a timeout, execute
+                    remove notification
+                after 450 ms
+            else
+                decrease notification's opacity
+                if notification's opacity is zero:
+                    add notification into remove list
+                else
+                    add an upward moving animation, lasting 500 ms
+
+	    remove all notifications in remove list 
+        伪代码结束 */
+
         // 创建单个通知容器
         const single_notification = document.createElement('div');
-        single_notification.className = 'notification';
+        single_notification.classList.add('notification');
+        single_notification.style.opacity = '0.7';
         // 将单个通知容器放入全部通知容器中
         this.notifications_container.appendChild(single_notification);
-        // 添加动画
-        single_notification.style.animation = 'fade-in 0.5s ease';
         // 书写通知内容
         const paragraph = document.createElement('p');
         paragraph.textContent = message.toString();
         single_notification.appendChild(paragraph);
+        // 创建通知之间的间隙
+        const gap = document.createElement('div');
+        const GAP_HEIGHT = 8;
+        gap.style.height = `${GAP_HEIGHT}px`;
+        this.notifications_container.appendChild(gap);
+        // 修改动画数据
+        this.notifications.push({
+            element: single_notification,
+            animation: undefined,
+        });
+        // 提前计算新通知高度
+        const NEW_HEIGHT = Number(
+            getComputedStyle(single_notification).getPropertyValue('height')
+        );
+
+        // 遍历通知
+        const notification_list = this.notifications.map(value => value.element);
+        const remove_list = []; // 删除列表
+        debugger;
+        notification_list.forEach((value, key, parent) => {
+            if (key === parent.length - 1) {
+                // 新通知
+                // 添加动画
+                const { keyframes, options } = this.getAnimation(0, 0.7, 40, 0);
+                this.notifications[key].animation = value.animate(keyframes, options);
+                // 延迟后清除通知
+                setTimeout(() => {
+                    const { keyframes, options } = this.getAnimation(undefined, 0, 0, 40);
+                    this.notifications[key].animation = value.animate(keyframes, options);
+                    setTimeout(() => {
+                        value.remove();
+                        this.notifications.splice(key, 1);
+                    }, 450);
+                }, 5000);
+            } else {
+                // 降低透明度
+                const computedStyle = getComputedStyle(value);
+                let opacity = Number(computedStyle.getPropertyValue('opacity'));
+                const OPACITY_DECREMENT = 0.2;
+                if (opacity < OPACITY_DECREMENT) {
+                    value.style.opacity = 0;
+                } else {
+                    value.style.opacity = opacity - OPACITY_DECREMENT;
+                }
+                // 根据最终透明度，移除元素或加动画
+                opacity = computedStyle.getPropertyValue('opacity');
+                if (opacity === 0) {
+                    // 加入移除队列
+                    remove_list.push(key);
+                } else {
+                    // 动态计算偏移高度，施加动画
+                    let initial_translateY = NEW_HEIGHT + GAP_HEIGHT;
+                    if (this.notifications[key].animation.playState !== 'finished') {
+                        this.notifications[key].animation.finish();
+                    }
+                    const { keyframes, options } = this.getAnimation(undefined, undefined, initial_translateY, 0);
+                    this.notifications[key].animation = value.animate(keyframes, options);
+                }
+            }
+        });
+        // // 添加动画
+        // single_notification.classList
+        //     .add('translationally-fade-in', 'opaquely-fade-in');
         // // 延迟5秒，播放出场动画
         // setTimeout(() => {
-        //     single_notification.style.animation = 'fade-out 0.5s ease';
-        //     // 再延迟0.5秒，删除通知和缝隙
+        //     single_notification.classList
+        //         .remove('translationally-fade-in', 'opaquely-fade-in');
+        //     single_notification.classList
+        //         .add('translationally-fade-out', 'opaquely-fade-out');
+        //     // 再延迟0.45秒，删除通知和缝隙
         //     setTimeout(() => {
         //         single_notification.remove();
         //         gap.remove();
-        //     }, 500);
+        //     }, 450);
         // }, 5000);
+        // 渐隐远古通知，防止通知溢出
+        // this.notifications_container
+        //     .querySelectorAll('.notification')
+        //     .forEach((element, index, arr) => {
+        //         // 再调整透明度
+        //         const opacity = Number(element.style.opacity);
+        //         // 如果element的序号是最后一个，则不更改
+        //         if (index === arr.length - 1) {
+        //             ;
+        //         } else {
+        //             // 移除透明度动画
+        //             element.classList.remove('opaquely-fade-in');
+        //             if (opacity < 0.2) {
+        //             // 如果opacity过小，就设为0    
+        //                 element.style.opacity = 0;
+        //             } else {
+        //             // 如果都不是，就把opacity减小0.2
+        //                 element.style.opacity = opacity - 0.2;
+        //             }
+        //         }
+        //     });
+    }
 
-        // 创建通知之间的18px间隙
-        const gap = document.createElement('div');
-        gap.style.height = '8px';
-        this.notifications_container.appendChild(gap);
+    getAnimation(initial_opacity, final_opacity, initial_translateY, final_translateY) {
+        // 自动化返回关键帧和选项
+        const options = {
+            duration: 3000,
+            iterations: 1,
+            easing: 'ease',
+        }
+        // 组装关键帧
+        const keyframes = [];
+        const keyframe1 = {};
+        const keyframe2 = {};
+        if (initial_opacity !== undefined) {
+            keyframe1.opacity = initial_opacity;
+        }
+        keyframe1.transform = `translateY(${initial_translateY}px)`;
+        if (final_opacity !== undefined) {
+            keyframe2.opacity = final_opacity;
+        }
+        keyframe2.transform = `translateY(${final_translateY}px)`;
+        keyframes.push(keyframe1, keyframe2)
+        return {
+            keyframes: keyframes,
+            options: options,
+        };
     }
 }
 

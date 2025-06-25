@@ -55,12 +55,27 @@ class App {
         this.ueh.buttonServices(this.dm, this.r);
 
     }
+
+    test() {
+        debugger;
+        let i = 0;
+        let delay = 0;
+        while (i < 10) {
+            setTimeout(() => {
+                this.r.notify(i)
+            }, delay);
+            i += 1;
+            delay += 500;
+        }
+    }
 }
 
 // 定义主程序
 function main() {
     const app = new App(UEH, R, NM, DM);
     app.run();
+
+    app.test();
 }
 
 // 运行

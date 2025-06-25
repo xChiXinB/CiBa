@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>测试WAAPI</title>
+    <style>
+        .circle {
+            width: 80px;
+            height: 80px;
+            background-color: green;
+            border-radius: 40px;
+        }
+
+        .box {
+            display: flex;
+            flex-direction: column;
+            column-gap: 8px;
+        }
+
+        .fill {
+            width: 50px;
+            height: 15px;
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="circle" id="circle"></div>
+    <div style="height: 100px;"></div>
+    <button id="pause">Click to pause</button>
+    <button id="new">Click to add new animation</button>
+    <div class="box" id="box">
+        <div class="fill"></div>
+        <div class="fill"></div>
+        <div class="fill"></div>
+    </div>
+    <script>
+        const circle = document.getElementById('circle');
+        const keyframes = [
+            {transform: 'translateY(50px)'},
+            {transform: 'translateY(0px)'},
+        ];
+        const options = {
+            duration: 2000,
+            iterations: 1,
+            easing: 'linear',
+        };
+        const animation = circle.animate(keyframes, options);
+
+        const pause = document.getElementById('pause');
+        pause.addEventListener('click', () => {
+            animation.pause();
+        });
+
+        const new_button = document.getElementById('new')
+        new_button.addEventListener('click', () => {
+            // const currentTransform = window.getComputedStyle(circle)
+            //     .getPropertyValue('transform')
+            //     .match(/-?\d+\.?(\d+)?/g)
+            //     .map(Number)
+            //     [5];
+            // console.log(currentTransform);
+            debugger;
+            animation.commitStyles();
+            debugger;
+            animation.cancel();
+            const keyframes2 = [
+                {},
+                {transform: `translateX(100px)`,},
+            ];
+            const options2 = {
+                duration: 1000,
+                iterations: 1,
+                easing: 'ease',
+            };
+            const animation2 = circle.animate(keyframes2, options2);
+            console.log(animation2);
+        });
+
+
+        const box = document.getElementById('box');
+
+    </script>
+</body>
+</html>

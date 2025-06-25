@@ -1,11 +1,9 @@
-const condition = false;
+const a = [
+    {x: 1},
+    {x: 2},
+    {x: 3},
+];
 
-(condition?
-    (() => {
-        console.log('true');
-    }):
-    (() => {
-        console.log('false');
-    }))();
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+console.log(
+    a.map(value => value.x)
+);
