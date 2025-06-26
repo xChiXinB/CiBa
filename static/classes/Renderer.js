@@ -30,6 +30,7 @@ class Renderer {
             // },
         };
         this.animationLength = 500;
+        this.notificationClearDelay = 5000;
     }
 
     translationAutoHeight() {
@@ -202,7 +203,7 @@ class Renderer {
                     this.notificationsData[id]?.animation.cancel();
                 });
                 console.log('设置了删除timeout');
-                this.removeNotificationTimeout(id, true)
+                this.delayedNotificationClear(id, true)
             } else {
                 console.log('旧通知');
                 // 旧通知
@@ -231,7 +232,7 @@ class Renderer {
                     this.notificationsData[id]?.animation.cancel();
                     // 如果透明度为零，移除自己
                     if (this.notificationsData[id]?.opacity === 0) {
-                        this.removeNotificationTimeout(id, false);
+                        this.delayedNotificationClear(id, false);
                     }
                 });
             }
@@ -301,11 +302,11 @@ class Renderer {
         };
     }
 
-    removeNotificationTimeout(id, displayAnimation) {
+    delayedNotificationClear(id, displayAnimation) {
         // 移除一个通知
         const targetNotification = document.getElementById(id);
         // 计算timeout时间
-        const delayTime = displayAnimation ? 5000 : 0;
+        const delayTime = displayAnimation ? this.notificationClearDelay : 0;
         const removeDelayTime = displayAnimation ? this.animationLength : 0;
 
         setTimeout(() => {
