@@ -164,7 +164,6 @@ class UserEventHandler {
         if (Date.now() - DataManager.lastSubmitTime <= 2000) {
             Renderer.notify('操作过于频繁，请稍后再试。');
             return false;
-
         }
         return new_vocabulary;
     }
