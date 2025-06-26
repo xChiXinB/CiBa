@@ -29,7 +29,7 @@ class Renderer {
             //     animation: Animation,
             // },
         };
-        this.animationLength = 2000;
+        this.animationLength = 500;
     }
 
     translationAutoHeight() {
