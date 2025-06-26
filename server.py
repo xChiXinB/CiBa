@@ -70,7 +70,10 @@ def get_translation(vocab):
         # Service Unavailable
         flask.abort(503)
     else:
-        response = app.web_scraper_api.search(vocab)
+        try:
+            response = app.web_scraper_api.search(vocab)
+        except:
+            flask.abort(500)
     return response
 
 @app.route('/input')
