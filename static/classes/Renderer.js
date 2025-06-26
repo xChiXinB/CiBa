@@ -22,7 +22,14 @@ class Renderer {
             }, 490);
         };
         // 用于管理动画
-        this.notifications = [];
+        this.notificationsData = {
+            // id: {
+            //     element: element,
+            //     opacity: number,
+            //     animation: Animation,
+            // },
+        };
+        this.animationLength = 2000;
     }
 
     translationAutoHeight() {
@@ -164,33 +171,92 @@ class Renderer {
 
     notify(message) {
         // 向用户弹出通知
-        /*	伪代码
-        add a new notification display
-	
-        define x as (get all notification displays as a list)
-        for each of the item, as notification, in x:
-            if index of notification in x is biggest // technically, equals to x's length minus one
-                add an upward moving animation, lasting 500 ms
-                add an increasing opacity animation, lasting 500 ms
-                set a timeout, execute
-                    remove notification
-                after 450 ms
-            else
-                decrease notification's opacity
-                if notification's opacity is zero:
-                    add notification into remove list
-                else
-                    add an upward moving animation, lasting 500 ms
+        // 创建新通知
+        const new_height_offset = this.addNotificationObj(message);
 
-	    remove all notifications in remove list 
-        伪代码结束 */
+        // 遍历通知
+        const notification_list = Object.values(this.notificationsData).map(
+            value => value.element
+        );
+        notification_list.forEach((value, key, parent) => {
+            // 获取这个通知的id
+            const id = value.id
+            console.group(id);
+            // 根据通知的新旧程度进行不同操作
+            if (key === parent.length - 1) {
+                console.log('新通知');
+                // 新通知
+                // 添加动画
+                const final_opacity = this.notificationsData[id].opacity;
+                console.log('应该把透明度设置为：');
+                console.log(final_opacity);
+                const { keyframes, options } = this.getAnimation(id, final_opacity, 0);
+                console.log(keyframes);
+                console.log(options);
+                this.notificationsData[id].animation = value.animate(keyframes, options);
+                // 添加事件监视器
+                this.notificationsData[id].animation.addEventListener('finish', () => {
+                    // 注意动画可能已经被删除
+                    console.log('这个动画似乎结束了');
+                    this.notificationsData[id]?.animation.commitStyles();
+                    this.notificationsData[id]?.animation.cancel();
+                });
+                console.log('设置了删除timeout');
+                this.removeNotificationTimeout(id, true)
+            } else {
+                console.log('旧通知');
+                // 旧通知
+                // 降低透明度
+                let opacity = this.notificationsData[id].opacity;
+                const OPACITY_DECREMENT = 0.2;
+                if (opacity < OPACITY_DECREMENT) {
+                    opacity = 0;
+                } else {
+                    opacity = opacity - OPACITY_DECREMENT;
+                }
+                this.notificationsData[id].opacity = opacity;
 
-        // 创建单个通知容器
+                // 添加上移动动画
+                const currentTranslateY = this.getTranslateY(id);
+                // 取消旧动画
+                this.notificationsData[id].animation.commitStyles();
+                this.notificationsData[id].animation.cancel();
+                value.style.transform = `translateY(${currentTranslateY + new_height_offset}px)`;
+                const { keyframes, options } = this.getAnimation(id, this.notificationsData[id].opacity, 0);
+                // 更新新动画
+                this.notificationsData[id].animation = value.animate(keyframes, options);
+                // 添加事件监视器
+                this.notificationsData[id].animation.addEventListener('finish', () => {
+                    this.notificationsData[id]?.animation.commitStyles();
+                    this.notificationsData[id]?.animation.cancel();
+                    // 如果透明度为零，移除自己
+                    if (this.notificationsData[id]?.opacity === 0) {
+                        this.removeNotificationTimeout(id, false);
+                    }
+                });
+            }
+            console.groupEnd(id)
+        });
+    }
+
+    addNotificationObj(message) {
+        // 创建单个通知和缝隙容器
+        const notification_and_gap = document.createElement('div');
+        notification_and_gap.classList.add('notification-and-gap');
+        this.notifications_container.appendChild(notification_and_gap);
+        // 注册信息
+        const id = crypto.randomUUID();
+        this.notificationsData[id] = {
+            element: notification_and_gap,
+            opacity: 0.7,
+        };
+        notification_and_gap.id = id;
+
+        // 创建单个通知
         const single_notification = document.createElement('div');
         single_notification.classList.add('notification');
-        single_notification.style.opacity = '0.7';
         // 将单个通知容器放入全部通知容器中
-        this.notifications_container.appendChild(single_notification);
+        notification_and_gap.appendChild(single_notification);
         // 书写通知内容
         const paragraph = document.createElement('p');
         paragraph.textContent = message.toString();
@@ -199,124 +265,77 @@ class Renderer {
         const gap = document.createElement('div');
         const GAP_HEIGHT = 8;
         gap.style.height = `${GAP_HEIGHT}px`;
-        this.notifications_container.appendChild(gap);
-        // 修改动画数据
-        this.notifications.push({
-            element: single_notification,
-            animation: undefined,
-        });
+        notification_and_gap.appendChild(gap);
+
         // 提前计算新通知高度
         const NEW_HEIGHT = Number(
-            getComputedStyle(single_notification).getPropertyValue('height')
+            getComputedStyle(notification_and_gap).getPropertyValue('height')
+                .match(/[+-]?\d+(\.\d+)?/)[0] // 提取数字
         );
-
-        // 遍历通知
-        const notification_list = this.notifications.map(value => value.element);
-        const remove_list = []; // 删除列表
-        debugger;
-        notification_list.forEach((value, key, parent) => {
-            if (key === parent.length - 1) {
-                // 新通知
-                // 添加动画
-                const { keyframes, options } = this.getAnimation(0, 0.7, 40, 0);
-                this.notifications[key].animation = value.animate(keyframes, options);
-                // 延迟后清除通知
-                setTimeout(() => {
-                    const { keyframes, options } = this.getAnimation(undefined, 0, 0, 40);
-                    this.notifications[key].animation = value.animate(keyframes, options);
-                    setTimeout(() => {
-                        value.remove();
-                        this.notifications.splice(key, 1);
-                    }, 450);
-                }, 5000);
-            } else {
-                // 降低透明度
-                const computedStyle = getComputedStyle(value);
-                let opacity = Number(computedStyle.getPropertyValue('opacity'));
-                const OPACITY_DECREMENT = 0.2;
-                if (opacity < OPACITY_DECREMENT) {
-                    value.style.opacity = 0;
-                } else {
-                    value.style.opacity = opacity - OPACITY_DECREMENT;
-                }
-                // 根据最终透明度，移除元素或加动画
-                opacity = computedStyle.getPropertyValue('opacity');
-                if (opacity === 0) {
-                    // 加入移除队列
-                    remove_list.push(key);
-                } else {
-                    // 动态计算偏移高度，施加动画
-                    let initial_translateY = NEW_HEIGHT + GAP_HEIGHT;
-                    if (this.notifications[key].animation.playState !== 'finished') {
-                        this.notifications[key].animation.finish();
-                    }
-                    const { keyframes, options } = this.getAnimation(undefined, undefined, initial_translateY, 0);
-                    this.notifications[key].animation = value.animate(keyframes, options);
-                }
-            }
-        });
-        // // 添加动画
-        // single_notification.classList
-        //     .add('translationally-fade-in', 'opaquely-fade-in');
-        // // 延迟5秒，播放出场动画
-        // setTimeout(() => {
-        //     single_notification.classList
-        //         .remove('translationally-fade-in', 'opaquely-fade-in');
-        //     single_notification.classList
-        //         .add('translationally-fade-out', 'opaquely-fade-out');
-        //     // 再延迟0.45秒，删除通知和缝隙
-        //     setTimeout(() => {
-        //         single_notification.remove();
-        //         gap.remove();
-        //     }, 450);
-        // }, 5000);
-        // 渐隐远古通知，防止通知溢出
-        // this.notifications_container
-        //     .querySelectorAll('.notification')
-        //     .forEach((element, index, arr) => {
-        //         // 再调整透明度
-        //         const opacity = Number(element.style.opacity);
-        //         // 如果element的序号是最后一个，则不更改
-        //         if (index === arr.length - 1) {
-        //             ;
-        //         } else {
-        //             // 移除透明度动画
-        //             element.classList.remove('opaquely-fade-in');
-        //             if (opacity < 0.2) {
-        //             // 如果opacity过小，就设为0    
-        //                 element.style.opacity = 0;
-        //             } else {
-        //             // 如果都不是，就把opacity减小0.2
-        //                 element.style.opacity = opacity - 0.2;
-        //             }
-        //         }
-        //     });
+        return NEW_HEIGHT;
     }
 
-    getAnimation(initial_opacity, final_opacity, initial_translateY, final_translateY) {
+    getAnimation(id, final_opacity, final_translateY) {
         // 自动化返回关键帧和选项
         const options = {
-            duration: 3000,
+            duration: this.animationLength,
             iterations: 1,
+            fill: 'forwards',
             easing: 'ease',
-        }
+        };
+
         // 组装关键帧
         const keyframes = [];
         const keyframe1 = {};
         const keyframe2 = {};
-        if (initial_opacity !== undefined) {
-            keyframe1.opacity = initial_opacity;
-        }
-        keyframe1.transform = `translateY(${initial_translateY}px)`;
-        if (final_opacity !== undefined) {
-            keyframe2.opacity = final_opacity;
-        }
+        // 从现在的transform开始
+        console.log(id);
+        keyframe1.transform = getComputedStyle(document.getElementById(id))
+            .getPropertyValue('transform');
+        keyframe2.opacity = final_opacity;
         keyframe2.transform = `translateY(${final_translateY}px)`;
         keyframes.push(keyframe1, keyframe2)
         return {
             keyframes: keyframes,
             options: options,
         };
+    }
+
+    removeNotificationTimeout(id, displayAnimation) {
+        // 移除一个通知
+        const targetNotification = document.getElementById(id);
+        // 计算timeout时间
+        const delayTime = displayAnimation ? 5000 : 0;
+        const removeDelayTime = displayAnimation ? this.animationLength : 0;
+
+        setTimeout(() => {
+            if (displayAnimation) {
+                // 播放出场动画
+                const { keyframes, options } = this.getAnimation(id, 0, 40)
+                targetNotification.animate(keyframes, options);
+            }
+            // 移除注册信息
+            delete this.notificationsData[id];
+            // 彻底移除通知
+            setTimeout(() => {
+                targetNotification.remove();
+            }, removeDelayTime);
+        }, delayTime);
+    }
+
+    getTranslateY(id) {
+        console.group('获取tY');
+        // 获取一个元素的TranslateY
+        const targetNotification = document.getElementById(id);
+        console.log(
+            getComputedStyle(targetNotification).getPropertyValue('transform')
+        );
+        const transform = getComputedStyle(targetNotification).getPropertyValue('transform')
+            .match(/[+-]?\d+(\.\d+)?/g);
+        console.groupEnd('获取tY');
+        return Number(
+            transform[transform.length - 1]
+        );
     }
 }
 

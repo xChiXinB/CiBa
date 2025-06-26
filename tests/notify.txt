@@ -4,22 +4,28 @@
 
 实现（伪代码）：
 define notify:
-	add a new notification display
+	add a new notification display (origin style is opaque and transformed)
+	get new notification height
+	assign this notification to this's notification data
 
 	define x as (get all notification displays as a list)
 	for each of the item, as notification, in x:
 		if index of notification in x is biggest // technically, equals to x's length minus one
-			add an upward moving animation, lasting 500 ms
-			add an increasing opacity animation, lasting 500 ms
+			add an animation, where final stage's opacity is 0.7 (get by query data)
 			set a timeout, execute
-				add a leaving animation, then
-				remove notification
+				if this notification still exist
+					add a leaving animation, then
+					remove notification()
 			after 5000 ms
 		else
-			decrease notification's opacity
+			decrease notification's opacity in the data
+			apply transform style to notification
+			add an animation, where final stage's opacity is get by query data
 			if notification's opacity is zero:
 				add notification into remove list
-			else
-				add an upward moving animation, lasting 500 ms
 
-	remove all notifications in remove list 
+	remove() all notifications in remove list 
+
+method: addNotificationObj, getTranslateY, getAnimation, remove
+
+核心思路：把初始的状态放在动画外完成

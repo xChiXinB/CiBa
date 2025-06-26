@@ -57,16 +57,9 @@ class App {
     }
 
     test() {
-        debugger;
-        let i = 0;
-        let delay = 0;
-        while (i < 10) {
-            setTimeout(() => {
-                this.r.notify(i)
-            }, delay);
-            i += 1;
-            delay += 500;
-        }
+        window.addEventListener('keydown', () => {
+            this.r.notify('这是一则非常长的通知消息');
+        });
     }
 }
 
