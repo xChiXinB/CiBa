@@ -50,25 +50,22 @@ class WebScraperAPI:
         )
 
         # 根据找到的元素进行相应处理
-        if res:
-            if res.get_attribute('class') == 'pos':
-                # 解析释义
-                bs = BeautifulSoup(self.edge_driver.page_source, 'html.parser')
-                ul = bs.find_all('ul')
-                li = ul[2].find_all('li')
-                response = ''
-                for _ in li:
-                    text = _.get_text()
-                    if text[0:2] != '网络': # 剔除网络释义
-                        response += f'{text}\n'
-                response = response[0:-1]
-            elif res.get_attribute('class') == 'no_results':
-                response = '没有搜索结果'
-            self.find_search_box()
-            self.isBusy = False
-            return response
-        else:
-            pass
+        if res.get_attribute('class') == 'pos':
+            # 解析释义
+            bs = BeautifulSoup(self.edge_driver.page_source, 'html.parser')
+            ul = bs.find_all('ul')
+            li = ul[2].find_all('li')
+            response = ''
+            for _ in li:
+                text = _.get_text()
+                if text[0:2] != '网络': # 剔除网络释义
+                    response += f'{text}\n'
+            response = response[0:-1]
+        elif res.get_attribute('class') == 'no_results':
+            response = '没有搜索结果'
+        self.find_search_box()
+        self.isBusy = False
+        return response
 
 # 初始化爬虫API
 app.web_scraper_api = WebScraperAPI()
