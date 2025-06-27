@@ -1,0 +1,31 @@
+预期的表现：
+远古通知上隐（增加性能：opacity=0以后直接remove）
+新通知出现后，旧通知丝滑上移
+
+实现（伪代码）：
+define notify:
+	add a new notification display (origin style is opaque and transformed)
+	get new notification height
+	assign this notification to this's notification data
+
+	define x as (get all notification displays as a list)
+	for each of the item, as notification, in x:
+		if index of notification in x is biggest // technically, equals to x's length minus one
+			add an animation, where final stage's opacity is 0.7 (get by query data)
+			set a timeout, execute
+				if this notification still exist
+					add a leaving animation, then
+					remove notification()
+			after 5000 ms
+		else
+			decrease notification's opacity in the data
+			apply transform style to notification
+			add an animation, where final stage's opacity is get by query data
+			if notification's opacity is zero:
+				add notification into remove list
+
+	remove() all notifications in remove list 
+
+method: addNotificationObj, getTranslateY, getAnimation, remove
+
+核心思路：把初始的状态放在动画外完成

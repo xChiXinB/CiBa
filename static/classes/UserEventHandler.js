@@ -111,6 +111,10 @@ class UserEventHandler {
                 const translation = await NetworkManager.fetchTranslation(new_vocabulary);
                 // 成功后展示翻译
                 Renderer.addTranslation(new_row, translation);
+                // 处理未找到结果
+                if (translation === '没有搜索结果') {
+                    Renderer.notify('未找到结果，请检查拼写是否正确！');
+                }
             } catch (err) {
                 Renderer.notify(`请求出现问题：${err.message}`);
                 // 失败后展示“出现错误”
@@ -152,9 +156,9 @@ class UserEventHandler {
                 .value;
             Renderer.notify(
                 `${new_vocabulary}重复！释义：
-                ${translation.length > 10?
-                    `${translation.slice(0, 10)}...`:
-                    translation
+                ${translation.length > 10
+                    ? `${translation.slice(0, 10)}...`
+                    : translation
                 }`
             );
             console.log(Object.keys(DataManager.vocabulary).indexOf(new_vocabulary));
@@ -164,7 +168,6 @@ class UserEventHandler {
         if (Date.now() - DataManager.lastSubmitTime <= 2000) {
             Renderer.notify('操作过于频繁，请稍后再试。');
             return false;
-
         }
         return new_vocabulary;
     }

@@ -21,6 +21,16 @@ class Renderer {
                 element.style.transform = 'scale(1.0)';
             }, 490);
         };
+        // 用于管理动画
+        this.notificationsData = {
+            // id: {
+            //     element: element,
+            //     opacity: number,
+            //     animation: Animation,
+            // },
+        };
+        this.animationLength = 500;
+        this.notificationClearDelay = 5000;
     }
 
     translationAutoHeight() {
@@ -162,25 +172,171 @@ class Renderer {
 
     notify(message) {
         // 向用户弹出通知
-        // 创建单个通知容器
+        // 创建新通知
+        const new_height_offset = this.addNotificationObj(message);
+
+        // 遍历通知
+        const notification_list = Object.values(this.notificationsData).map(
+            value => value.element
+        );
+        notification_list.forEach((value, key, parent) => {
+            // 获取这个通知的id
+            const id = value.id
+            console.group(id);
+            // 根据通知的新旧程度进行不同操作
+            if (key === parent.length - 1) {
+                console.log('新通知');
+                // 新通知
+                // 添加动画
+                const final_opacity = this.notificationsData[id].opacity;
+                console.log('应该把透明度设置为：');
+                console.log(final_opacity);
+                const { keyframes, options } = this.getAnimation(id, final_opacity, 0);
+                console.log(keyframes);
+                console.log(options);
+                this.notificationsData[id].animation = value.animate(keyframes, options);
+                // 添加事件监视器
+                this.notificationsData[id].animation.addEventListener('finish', () => {
+                    // 注意动画可能已经被删除
+                    console.log('这个动画似乎结束了');
+                    this.notificationsData[id]?.animation.commitStyles();
+                    this.notificationsData[id]?.animation.cancel();
+                });
+                console.log('设置了删除timeout');
+                this.delayedNotificationClear(id, true)
+            } else {
+                console.log('旧通知');
+                // 旧通知
+                // 降低透明度
+                let opacity = this.notificationsData[id].opacity;
+                const OPACITY_DECREMENT = 0.2;
+                if (opacity < OPACITY_DECREMENT) {
+                    opacity = 0;
+                } else {
+                    opacity = opacity - OPACITY_DECREMENT;
+                }
+                this.notificationsData[id].opacity = opacity;
+
+                // 添加上移动动画
+                const currentTranslateY = this.getTranslateY(id);
+                // 取消旧动画
+                this.notificationsData[id].animation.commitStyles();
+                this.notificationsData[id].animation.cancel();
+                value.style.transform = `translateY(${currentTranslateY + new_height_offset}px)`;
+                const { keyframes, options } = this.getAnimation(id, this.notificationsData[id].opacity, 0);
+                // 更新新动画
+                this.notificationsData[id].animation = value.animate(keyframes, options);
+                // 添加事件监视器
+                this.notificationsData[id].animation.addEventListener('finish', () => {
+                    this.notificationsData[id]?.animation.commitStyles();
+                    this.notificationsData[id]?.animation.cancel();
+                    // 如果透明度为零，移除自己
+                    if (this.notificationsData[id]?.opacity === 0) {
+                        this.delayedNotificationClear(id, false);
+                    }
+                });
+            }
+            console.groupEnd(id)
+        });
+    }
+
+    addNotificationObj(message) {
+        // 创建单个通知和缝隙容器
+        const notification_and_gap = document.createElement('div');
+        notification_and_gap.classList.add('notification-and-gap');
+        this.notifications_container.appendChild(notification_and_gap);
+        // 注册信息
+        const id = crypto.randomUUID();
+        this.notificationsData[id] = {
+            element: notification_and_gap,
+            opacity: 0.7,
+        };
+        notification_and_gap.id = id;
+
+        // 创建单个通知
         const single_notification = document.createElement('div');
-        single_notification.className = 'notification';
+        single_notification.classList.add('notification');
         // 将单个通知容器放入全部通知容器中
-        this.notifications_container.appendChild(single_notification);
-        // 添加动画
-        single_notification.style.animation = 'fade-in 0.5s ease';
+        notification_and_gap.appendChild(single_notification);
         // 书写通知内容
         const paragraph = document.createElement('p');
         paragraph.textContent = message.toString();
         single_notification.appendChild(paragraph);
-        // 延迟5秒，播放出场动画
+        // 创建通知之间的间隙
+        const gap = document.createElement('div');
+        const GAP_HEIGHT = 8;
+        gap.style.height = `${GAP_HEIGHT}px`;
+        notification_and_gap.appendChild(gap);
+
+        // 提前计算新通知高度
+        const NEW_HEIGHT = Number(
+            getComputedStyle(notification_and_gap).getPropertyValue('height')
+                .match(/[+-]?\d+(\.\d+)?/)[0] // 提取数字
+        );
+        return NEW_HEIGHT;
+    }
+
+    getAnimation(id, final_opacity, final_translateY) {
+        // 自动化返回关键帧和选项
+        const options = {
+            duration: this.animationLength,
+            iterations: 1,
+            fill: 'forwards',
+            easing: 'ease',
+        };
+
+        // 组装关键帧
+        const keyframes = [];
+        const keyframe1 = {};
+        const keyframe2 = {};
+        // 从现在的transform开始
+        console.log(id);
+        keyframe1.transform = getComputedStyle(document.getElementById(id))
+            .getPropertyValue('transform');
+        keyframe2.opacity = final_opacity;
+        keyframe2.transform = `translateY(${final_translateY}px)`;
+        keyframes.push(keyframe1, keyframe2)
+        return {
+            keyframes: keyframes,
+            options: options,
+        };
+    }
+
+    delayedNotificationClear(id, displayAnimation) {
+        // 移除一个通知
+        const targetNotification = document.getElementById(id);
+        // 计算timeout时间
+        const delayTime = displayAnimation ? this.notificationClearDelay : 0;
+        const removeDelayTime = displayAnimation ? this.animationLength : 0;
+
         setTimeout(() => {
-            single_notification.style.animation = 'fade-out 0.5s ease';
-            // 再延迟0.5秒，删除通知
+            if (displayAnimation) {
+                // 播放出场动画
+                const { keyframes, options } = this.getAnimation(id, 0, 40)
+                targetNotification.animate(keyframes, options);
+            }
+            // 移除注册信息
+            delete this.notificationsData[id];
+            // 彻底移除通知
             setTimeout(() => {
-                single_notification.remove();
-            }, 500);
-        }, 5000);
+                targetNotification.remove();
+            }, removeDelayTime);
+        }, delayTime);
+    }
+
+    getTranslateY(id) {
+        console.group('获取tY');
+        // 获取一个元素的TranslateY
+        const targetNotification = document.getElementById(id);
+        console.log(
+            getComputedStyle(targetNotification).getPropertyValue('transform')
+        );
+        const transform = getComputedStyle(targetNotification).getPropertyValue('transform')
+            .match(/[+-]?\d+(\.\d+)?/g);
+        console.groupEnd('获取tY');
+        return Number(
+            transform[transform.length - 1]
+        );
     }
 }
 
