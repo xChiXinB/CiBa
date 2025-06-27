@@ -111,6 +111,10 @@ class UserEventHandler {
                 const translation = await NetworkManager.fetchTranslation(new_vocabulary);
                 // 成功后展示翻译
                 Renderer.addTranslation(new_row, translation);
+                // 处理未找到结果
+                if (translation === '没有搜索结果') {
+                    Renderer.notify('未找到结果，请检查拼写是否正确！');
+                }
             } catch (err) {
                 Renderer.notify(`请求出现问题：${err.message}`);
                 // 失败后展示“出现错误”
