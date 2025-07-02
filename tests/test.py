@@ -1,41 +1,39 @@
-import selenium.webdriver
-from selenium.webdriver.edge.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
+import requests
 from bs4 import BeautifulSoup
-import time
 
-# 初始化浏览器
-options = Options()
-options.add_argument('--user-agent=Mozilla/...Edge/136...')
-edge_driver = selenium.webdriver.Edge()
+class WebScraperAPI:
+    def __init__(self):
+        pass
 
-# 链接
-word = 'complicated'
+    def url_with(self, vocab):
+        """生成网页链接"""
+        return f'https://dict.youdao.com/result?word={vocab}&lang=en'
+    
+    def fetch_translation(self, vocab):
+        """爬取单词释义"""
+        return self.analyze(self.get_html(vocab))
 
-# 操作浏览器
-edge_driver.get(url='https://cn.bing.com/dict/')
-searchbox = WebDriverWait(edge_driver, 5).until(
-    expected_conditions.visibility_of_element_located((By.NAME, 'q'))
-)
-searchbox.clear()
-searchbox.send_keys(word)
-searchbox.send_keys(Keys.RETURN)
+    def get_html(self, vocab):
+        """获取网页结构"""
+        url = self.url_with(vocab)
+        try:
+            res = requests.get(url=url)
+        except:
+            return 'Network errors'
+        return res.text
 
-# 抓取有用信息
-WebDriverWait(edge_driver, 5).until(
-    expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'pos'))
-)
-time.sleep(0.5)
-bs = BeautifulSoup(edge_driver.page_source, 'html.parser')
-ul = bs.find_all('ul')
-li = ul[2].find_all('li')
-response = ''
-for _ in li:
-    text = _.get_text()
-    if text[0:2] != '网络':
-        response += text
+    def analyze(self, html):
+        """解析网页结构"""
+        soup = BeautifulSoup(html, 'html.parser')
+        # 尝试爬取释义部分
+        try:
+            ul = soup.find(class_ = 'basic').find_all(class_ = 'word-exp')
+        except AttributeError:
+            return 'No such vocab'
+        # 遍历获取释义文字
+        translation = ''
+        for li in ul:
+            translation += f'{li.get_text()}\n'
+        return translation
 
-edge_driver.quit()
+print(WebScraperAPI().fetch_translation('set'))

@@ -110,15 +110,13 @@ class UserEventHandler {
             try {
                 const translation = await NetworkManager.fetchTranslation(new_vocabulary);
                 // 成功后展示翻译
-                Renderer.addTranslation(new_row, translation);
-                // 处理未找到结果
-                if (translation === '没有搜索结果') {
-                    Renderer.notify('未找到结果，请检查拼写是否正确！');
-                }
+                Renderer.addTranslation(new_row, translation)
             } catch (err) {
+                // 提示用户出错
                 Renderer.notify(`请求出现问题：${err.message}`);
                 // 失败后展示“出现错误”
-                Renderer.addTranslation(new_row, '出现错误！');
+                const translation = '出现错误！'
+                Renderer.addTranslation(new_row, translation);
             } finally {
                 // 如果单词没被删，更新单词数据（true）
                 if (DataManager.vocabulary[new_vocabulary] !== undefined) {
