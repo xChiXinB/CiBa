@@ -35,9 +35,8 @@ class WebScraperAPI:
             print(type(res.text))
             print(type(res.text) == str)
             return res.text
-        except:
-            # 网络问题
-            print('没网络')
+        except requests.exceptions.RequestException:
+            # requests出现问题
             response = flask.jsonify({'error': '网络连接出现问题'})
             response.status_code = 503
             print(type(response))
