@@ -18,30 +18,32 @@ class WebScraperAPI:
     def fetch_translation(self, vocab):
         """爬取单词释义"""
         # 获取网页结构
-        print('外层函数')
         res = self.get_html(vocab)
-        if type(res) == flask.wrappers.Response:
-            # 返回了错误回应
-            return res
+        if res['ok']:
+            return self.analyze(res['response'], vocab)
         else:
-            return self.analyze(res, vocab)
+            # 返回了错误回应
+            return res['response']
 
     def get_html(self, vocab):
         """获取网页结构"""
         url = self.url_with(vocab)
         try:
-            print('获取中')
             res = requests.get(url=url)
-            print(type(res.text))
-            print(type(res.text) == str)
-            return res.text
+            return {
+                'response': res.text,
+                'ok': True
+            }
         except requests.exceptions.RequestException:
             # requests出现问题
             response = flask.jsonify({'error': '网络连接出现问题'})
             response.status_code = 503
             print(type(response))
             print(type(response) == flask.wrappers.Response)
-            return response
+            return {
+                'response': response,
+                'ok': False,
+            }
 
     def analyze(self, html, vocab):
         """解析网页结构"""
