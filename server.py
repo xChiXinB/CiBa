@@ -39,7 +39,7 @@ class WebScraperAPI:
             # 网络问题
             print('没网络')
             response = flask.jsonify({'error': '网络连接出现问题'})
-            response.status_code = 500
+            response.status_code = 503
             print(type(response))
             print(type(response) == flask.wrappers.Response)
             return response
@@ -52,7 +52,7 @@ class WebScraperAPI:
             ul = soup.find(class_ = 'basic').find_all(class_ = 'word-exp')
         except AttributeError:
             response = flask.jsonify({'error': f'未找到{vocab}'})
-            response.status_code = 500
+            response.status_code = 404
             return response
         # 遍历获取释义文字
         translation = ''
