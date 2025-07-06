@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>父窗口</title>
+</head>
+<body>
+    <p>这是一个父窗口</p>
+    <button id="open">点击这里召唤一个新窗口</button>
+    <button id="send">点击这里向窗口发送通知</button>
+
+    <script>
+        let children;
+        const open_btn = document.getElementById('open');
+        open_btn.addEventListener('click', () => {
+            children = window.open('children', 'o', 'width=500,height=500');
+        });
+
+        const send_btn = document.getElementById('send');
+        send_btn.addEventListener('click', () => {
+            children.postMessage('hey');
+        });
+    </script>
+</body>
+</html>

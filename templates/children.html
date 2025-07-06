@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>子窗口</title>
+</head>
+<body>
+    <p>这是一个字窗口</p>
+
+    <script>
+        window.addEventListener('message', (event) => {
+            console.log(event.data);
+        });
+    </script>
+</body>
+</html>
