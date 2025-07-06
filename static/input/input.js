@@ -15,10 +15,10 @@
 //         |___/                        |___/ 
 
 // 导入模块
-import { UserEventHandler as UEH } from "./classes/UserEventHandler.js";
-import { Renderer as R } from "./classes/Renderer.js";
-import { NetworkManager as NM } from "./classes/NetworkManager.js";
-import { DataManager as DM } from "./classes/DataManager.js";
+import { UserEventHandler as UEH } from "../classes/UserEventHandler.js";
+import { Renderer as R } from "../classes/Renderer.js";
+import { NetworkManager as NM } from "../classes/NetworkManager.js";
+import { DataManager as DM } from "../classes/DataManager.js";
 
 // 定义主应用
 class App {

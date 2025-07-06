@@ -86,4 +86,4 @@ def parent():
 def children():
     return flask.render_template('children.html')
 
-app.run(host='0.0.0.0', port=50907, debug=False)
+app.run(host='0.0.0.0', port=50907, debug=True)
