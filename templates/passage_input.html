@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>词霸（开发版）：从文章录入单词</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='passage_input/passage_input.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='pages/passage_input/passage_input.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='public/public.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='favicon-32x32.png') }}">
 </head>
@@ -14,17 +14,17 @@
             <p class="title">输入文章</p>
             <!--横向占位-->
             <div style="width: 2%;"></div>
-            <input type="text" placeholder="请在此粘贴文章，它们将显示于下方。" class="input-passage" id="input-passage">
+            <input type="text" placeholder="请在此粘贴文章，它们将显示于下方。" class="input-passage" id="input-box">
         </div>
 
         <!--文章显示区域-->
-        <div class="passage-display">
+        <div class="passage-display" id="passage-display">
             <!--竖向占位-->
             <div style="height: 13vh;"></div>
             <!--后续的文章内容在这里-->
         </div>
     </div>
 
-    <script type="module" src="{{ url_for('static', filename='passage_input/passage_input.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='pages/passage_input/passage_input.js') }}"></script>
 </body>
 </html>
