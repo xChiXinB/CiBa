@@ -35,3 +35,12 @@
     min-height: 100%;
     padding: 0px 3% 0px 3%; /* 左右有边距，上下没有 */
 }
+
+.passage-span {
+    color: white;
+    font-size: xx-large;
+}
+
+.passage-span-highlight {
+    background-color: #333333;
+}
