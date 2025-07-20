@@ -3,7 +3,7 @@
 .left {
     width: 25%;
     height: 100vh;
-    background-color: #111519;
+    background-color: #2563eb;
     position: fixed;
     left: 0px;
     top: 0px;
@@ -25,6 +25,18 @@
     border-radius: 5px;
     width: 50%;
     height: 4%;
+    border: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.input-word:hover {
+    border-color: #1d4ed8;
+}
+
+.input-word:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
 }
 
 .hint {
@@ -74,23 +86,23 @@
 }
 
 .head {
-    background-color: #343A40;
+    background-color: #1e40af;
     color: white;
 }
 
 .translation-input {
-    color: white;
+    color: #1e293b;
     font-size: 18px;
     width: 97%;
     height: 18px;
-    background-color: #0E1012;
+    background-color: #f1f5f9;
     overflow: hidden;
     resize: none;
     border: none;
 }
 
 .table-data {
-    color: white;
+    color: #1e293b;
     text-align: center;
     vertical-align: middle;
     font-size: 18px;
@@ -129,12 +141,12 @@
 }
 
 .notification {
-    background-color: wheat;
+    background-color: #dbeafe;
     min-height: 7vh;
     width: 100%;
     display: flex;
     border-radius: 8px;
-    border: #5C5343 3px solid;
+    border: #3b82f6 3px solid;
     flex-direction: row;
     align-items: center;
     justify-content: center;
@@ -149,42 +161,17 @@
 }
 
 .notification-text {
-    color: black;
+    color: #1e40af;
     font-size: 18px;
 }
 
-.translationally-fade-in {
-    animation: translationally-fade-in 0.5s ease
-}
-
-.translationally-fade-out {
-    animation: translationally-fade-out 0.5s ease
-}
-
-.opaquely-fade-in {
-    animation: opaquely-fade-in 0.5s ease;
-}
-
-.opaquely-fade-out {
-    animation: opaquely-fade-out 0.5s ease;
-}
-
-@keyframes translationally-fade-in {
-    0% {transform: translateY(40px);}
-    100% {transform: translateY(0px);}
-}
-
-@keyframes translationally-fade-out {
-    0% {transform: translateY(0px);}
-    100% {transform: translateY(40px);}
-}
-
-@keyframes opaquely-fade-in {
-    0% {opacity: 0;}
-    100% {opacity: 1;}
-}
-
-@keyframes opaquely-fade-out {
-    0% {}
-    100% {opacity: 0;}
+@keyframes fade-in {
+    0% {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0px);
+        opacity: 1;
+    }
 }

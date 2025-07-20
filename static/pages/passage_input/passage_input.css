@@ -1,9 +1,14 @@
 /* passage_input.css */
 
+body {
+    background-color: #f8fafc;
+    margin: 0px;
+}
+
 .top {
     width: 90%;
     height: 10vh;
-    background-color: #111519;
+    background-color: #2563eb;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -28,6 +33,18 @@
     width: 80%;
     height: 2.0vh;
     padding: 0.5vh;
+    border: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.input-passage:hover {
+    border-color: #1d4ed8;
+}
+
+.input-passage:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
 }
 
 .passage-display {
@@ -37,10 +54,18 @@
 }
 
 .passage-span {
-    color: white;
+    color: #1e293b;
     font-size: xx-large;
 }
 
 .passage-span-highlight {
-    background-color: #333333;
+    background-color: #dbfaff;
+    color: #1e40af;
+    transition: all 0.2s ease-in-out;
+}
+
+.passage-span-highlight:hover {
+    background-color: #a8cfff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
