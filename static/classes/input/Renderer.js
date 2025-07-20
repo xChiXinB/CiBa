@@ -4,6 +4,7 @@ class Renderer {
     constructor() {
         this.clear = document.getElementById('clear');
         this.save = document.getElementById('save');
+        this.passage_input_btn = document.getElementById('passage-input-btn');
         this.table = document.getElementById('word-table');
         this.notifications_container = document.getElementById('notifications-container');
         // 用于translationAutoHeight
@@ -56,10 +57,18 @@ class Renderer {
         this.clear.addEventListener('mouseleave', () => {this.mouseleave(this.clear);});
         this.save.addEventListener('mouseover', () => {this.mouseover(this.save);});
         this.save.addEventListener('mouseleave', () => {this.mouseleave(this.save);});
+        this.passage_input_btn.addEventListener('mouseover', () => {
+            this.mouseover(this.passage_input_btn);
+            this.addPassageInputTooltip();
+        });
+        this.passage_input_btn.addEventListener('mouseleave', () => {
+            this.mouseleave(this.passage_input_btn);
+            this.removePassageInputTooltip();
+        });
     }
 
     disableAllBtn() {
-        // 禁用所有按钮
+        // 禁用所有按钮（清空和保存列表）
         this.clear.disabled = this.save.disabled = true;
     }
 
@@ -337,6 +346,38 @@ class Renderer {
         return Number(
             transform[transform.length - 1]
         );
+    }
+
+    addPassageInputTooltip() {
+        // 添加文章录入提示框
+        const tooltip = document.createElement('div');
+        tooltip.className = 'passage-tooltip';
+        tooltip.innerHTML = `
+            <div>粘贴文章：点一下，就录入！</div>
+            <img src="/static/images/passage-input-information.gif" alt="文章录入说明">
+        `;
+        document.body.appendChild(tooltip);
+        
+        // 跟随鼠标移动
+        document.addEventListener('mousemove', this.updateTooltipPosition);
+        this.tooltip = tooltip;
+    }
+
+    removePassageInputTooltip() {
+        // 移除文章录入提示框
+        if (this.tooltip) {
+            document.body.removeChild(this.tooltip);
+            this.tooltip = null;
+            document.removeEventListener('mousemove', this.updateTooltipPosition);
+        }
+    }
+
+    updateTooltipPosition = (event) => {
+        // 更新提示框位置，跟随鼠标
+        if (this.tooltip) {
+            this.tooltip.style.left = (event.clientX + 10) + 'px';
+            this.tooltip.style.top = (event.clientY - this.tooltip.offsetHeight - 10) + 'px';
+        }
     }
 }
 

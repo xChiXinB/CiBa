@@ -4,6 +4,7 @@ class UserEventHandler {
         this.table = document.getElementById('word-table');
         this.clear = document.getElementById('clear');
         this.save = document.getElementById('save');
+        this.passage_input_btn = document.getElementById('passage-input-btn');
     }
 
     vocabSubmitService(DataManager, Renderer, NetworkManager) {
@@ -12,13 +13,17 @@ class UserEventHandler {
         this.listenEnterKey(DataManager, Renderer, NetworkManager);
     }
 
-    buttonServices(DataManager, Renderer) {
+    buttonServices(DataManager, Renderer, NetworkManager) {
         // 监听保存和清空按钮
         this.save.addEventListener('click', () => {
             this.btnSave(DataManager, Renderer);
         });
         this.clear.addEventListener('click', () => {
             this.btnClear(DataManager, Renderer);
+        });
+        // 监听文章录入按钮
+        this.passage_input_btn.addEventListener('click', () => {
+            this.openPassageInput(DataManager, Renderer, NetworkManager);
         });
     }
 
@@ -41,7 +46,7 @@ class UserEventHandler {
         const name = `生词记录 ${new Date().toString()}.xlsx`;
         XLSX.writeFile(workbook, name);
         // 3. 提醒用户导出成功
-        Renderer.notify('已保存表格到本地！');
+        this.r.notify('已保存表格到本地！');
         // 4. 清空表格
         this.btnClear(DataManager, Renderer);
         // 5. 补回“操作”
@@ -86,10 +91,10 @@ class UserEventHandler {
         });
     }
 
-    async submitVocab(DataManager, Renderer, NetworkManager) {
+    async submitVocab(DataManager, Renderer, NetworkManager, ignoreFocus=false) {
         // 提交单词
         console.log('submitting...');
-        const new_vocabulary = this.canSubmitNow(DataManager, Renderer);
+        const new_vocabulary = this.canSubmitNow(DataManager, Renderer, ignoreFocus);
         // 检查提交条件，如果不能提交则new_vocabulary === false
         if (typeof new_vocabulary === 'string') {
             // 启用清空按钮
@@ -111,12 +116,14 @@ class UserEventHandler {
                 const translation = await NetworkManager.fetchTranslation(new_vocabulary);
                 // 成功后展示翻译
                 Renderer.addTranslation(new_row, translation)
+                return true; // 成功录入
             } catch (err) {
                 // 提示用户出错
                 Renderer.notify(`请求出现问题：${err.message}`);
-                // 失败后展示“出现错误”
+                // 失败后展示"出现错误"
                 const translation = '出现错误！'
                 Renderer.addTranslation(new_row, translation);
+                return false; // 录入失败
             } finally {
                 // 如果单词没被删，更新单词数据（true）
                 if (DataManager.vocabulary[new_vocabulary] !== undefined) {
@@ -126,12 +133,13 @@ class UserEventHandler {
                 Renderer.tryEnableSaveBtn(DataManager);
             }
         }
+        return false; // 不能提交
     }
 
-    canSubmitNow(DataManager, Renderer) {
+    canSubmitNow(DataManager, Renderer, ignoreFocus=false) {
         // 检测是否可以提交单词
-        // 焦点不在输入框
-        if (document.activeElement !== this.input_box) {
+        // 焦点不在输入框，且ignoreFocus为假
+        if ((document.activeElement !== this.input_box) && !ignoreFocus) {
             return false;
         }
         // 输入为空
@@ -193,6 +201,30 @@ class UserEventHandler {
             Renderer.removeIndex(row_index, DataManager);
             // 通知用户
             Renderer.notify(`已删除${vocab}。`);
+        });
+    }
+
+    openPassageInput(DataManager, Renderer, NetworkManager) {
+        // 打开文章录入页面
+        const passageWindow = window.open('/passageinput', 'passage_input', 'width=800,height=600');
+        if (passageWindow) {
+            Renderer.notify('已开启文章录入模式！');
+        }
+    }
+
+    listenPassageInput(DataManager, Renderer, NetworkManager) {
+        // 监听来自passage-input页面的消息
+        window.addEventListener('message', async (event) => {
+            if (event.data && event.data.type === 'word_click') {
+                const word = event.data.word;
+                // 模拟输入框输入单词
+                this.input_box.value = word;
+                // 提交单词
+                const success = await this.submitVocab(DataManager, Renderer, NetworkManager, true);
+                if (success) {
+                    Renderer.notify(`已录入文章中的${word}单词！`);
+                }
+            }
         });
     }
 }

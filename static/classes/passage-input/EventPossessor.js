@@ -37,6 +37,10 @@ class EventPossessor {
                 span.textContent = value;
                 if (index % 2 === highlighted_modular_res) {
                     span.classList.add('passage-span-highlight');
+                    // 为高亮的单词添加点击事件
+                    span.addEventListener('click', () => {
+                        this.handleWordClick(value);
+                    });
                 }
                 // 放置元素
                 this.passage_display.appendChild(span);
@@ -57,6 +61,17 @@ class EventPossessor {
             text_disassembly: text_disassembly,
             is_start_with_vocab: beginning.match(/\w/g) !== null, // 开始部分包含字母
         };
+    }
+
+    handleWordClick(word) {
+        // 处理单词点击事件
+        if (window.opener) {
+            // 向input页面发送消息
+            window.opener.postMessage({
+                type: 'word_click',
+                word: word
+            }, '*');
+        }
     }
 }
 

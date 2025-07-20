@@ -52,8 +52,11 @@ class App {
         // 保存按钮功能运行
         // 清空按钮功能运行
         console.log('Button function activated!');
-        this.ueh.buttonServices(this.dm, this.r);
+        this.ueh.buttonServices(this.dm, this.r, this.nm);
 
+        // 文章录入功能运行
+        console.log('Import from passage activated!');
+        this.ueh.listenPassageInput(this.dm, this.r, this.nm);
     }
 }
 
