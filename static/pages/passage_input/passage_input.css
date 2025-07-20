@@ -1,0 +1,90 @@
+/* passage_input.css */
+
+body {
+    background-color: #f8fafc;
+    margin: 0px;
+}
+
+.top {
+    width: 90vw;
+    height: 80px;
+    background-color: #2563eb;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 0px 0px 15px 15px;
+    position: fixed;
+    top: 0px;
+    left: 5vw;
+    box-sizing: border-box;
+    padding-left: 25px;
+    padding-right: 25px;
+}
+
+.title {
+    font-size: 28px;
+    color: white;
+    padding-right: 35px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    line-height: 1;
+}
+
+.input-passage {
+    height: 25px;
+    font-size: 18px;
+    border-radius: 5px;
+    border: none;
+    box-sizing: border-box;
+    flex: 1 1 0;
+    min-width: 60px;
+    max-width: 100%;
+}
+
+.input-passage:hover {
+    border-color: #1d4ed8;
+}
+
+.input-passage:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+.passage-display {
+    width: 100%;
+    min-height: 100%;
+    padding: 0px 3% 0px 3%; /* 左右有边距，上下没有 */
+}
+
+.passage-span {
+    color: #1e293b;
+    font-size: xx-large;
+}
+
+.passage-span-highlight {
+    background-color: #dbfaff;
+    color: #1e40af;
+    transition: all 0.2s ease-in-out;
+}
+
+.passage-span-highlight:hover {
+    background-color: #a8cfff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* @media (max-width: 900px) {
+    .top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .input-passage {
+        width: 100%;
+        font-size: 1em;
+        margin-left: 0;
+        margin-top: 8px;
+    }
+} */

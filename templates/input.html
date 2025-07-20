@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8"/>
     <title>词霸（开发版）：录入单词</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
-    <link rel="icon" href="{{ url_for('static', filename='favicon-32x32.png') }}"
+    <link rel="stylesheet" href="{{ url_for('static', filename='pages/input/input.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='public/public.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon-32x32.png') }}">
 </head>
 <body>
     <div class="main">
@@ -19,9 +20,9 @@
             <p class="hint">（Mac端为Command+V）</p>
             <div style="height: 20px;"></div>
             <div class="left-btn-grid">
-                <button type="button" class="left-buttons" id="clear" style="background-color: red;">清空列表</button>
-                <button type="button" class="left-buttons" id="save" style="background-color: lightgreen;">保存列表</button>
-                <button type="button" class="left-buttons" style="background-color: gold; display: none;">智能录入</button>
+                <button type="button" class="left-buttons" id="clear" style="background-color: #ef4444;">清空列表</button>
+                <button type="button" class="left-buttons" id="save" style="background-color: #10b981;">保存列表</button>
+                <button type="button" class="left-buttons" id="passage-input-btn" style="background-color: #3b82f6;">文章录入</button>
                 <button type="button" class="left-buttons" style="background-color: cyan; display: none;">开始背诵</button>
             </div>
         </div>
@@ -57,6 +58,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='xlsx.full.min.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='input.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='pages/input/input.js') }}"></script>
 </body>
 </html>

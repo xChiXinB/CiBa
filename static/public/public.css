@@ -1,0 +1,12 @@
+/* public.css */
+
+.main {
+    background-color: #e2fbff;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 0;
+    left: 0;
+}   
