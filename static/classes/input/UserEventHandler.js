@@ -206,7 +206,9 @@ class UserEventHandler {
 
     openPassageInput(Renderer) {
         // 打开文章录入页面
-        const passageWindow = window.open('/passageinput', 'passage_input', 'width=800,height=600');
+        const passageWindow = window.open('/passageinput', 'passage_input', 
+            'left=644,top=434,width=1130,height=558'
+        );
         if (passageWindow) {
             Renderer.notify('已开启文章录入模式！');
         }

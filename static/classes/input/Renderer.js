@@ -59,11 +59,11 @@ class Renderer {
         this.save.addEventListener('mouseleave', () => {this.mouseleave(this.save);});
         this.passage_input_btn.addEventListener('mouseover', () => {
             this.mouseover(this.passage_input_btn);
-            this.addPassageInputTooltip();
+            // this.addPassageInputTooltip();
         });
         this.passage_input_btn.addEventListener('mouseleave', () => {
             this.mouseleave(this.passage_input_btn);
-            this.removePassageInputTooltip();
+            // this.removePassageInputTooltip();
         });
     }
 
