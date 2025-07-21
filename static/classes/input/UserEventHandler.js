@@ -23,7 +23,7 @@ class UserEventHandler {
         });
         // 监听文章录入按钮
         this.passage_input_btn.addEventListener('click', () => {
-            this.openPassageInput(DataManager, Renderer, NetworkManager);
+            this.openPassageInput(Renderer);
         });
     }
 
@@ -204,7 +204,7 @@ class UserEventHandler {
         });
     }
 
-    openPassageInput(DataManager, Renderer, NetworkManager) {
+    openPassageInput(Renderer) {
         // 打开文章录入页面
         const passageWindow = window.open('/passageinput', 'passage_input', 'width=800,height=600');
         if (passageWindow) {
