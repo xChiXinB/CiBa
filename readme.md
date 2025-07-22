@@ -6,6 +6,7 @@
 
 # 主要功能
 - [x] `Ctrl + C`和`Ctrl + V`一键整理单词
+- [x] 从文章内一键摘抄生词
 - [x] 随时随地删除单词、修改释义
 - [x] 一键输出为Excel表格，轻松交作业
 
@@ -13,19 +14,20 @@
 
 # 使用方法
 
-## 环境建议
-- Python 3.11+ （推荐使用新版本）
-- Python依赖库：`pip install flask bs4 selenium`
+## 环境配置
+- Python 3
+- Python依赖库：`pip install flask requests bs4`
 
 ## 运行操作
 
 ### 第一步：下载项目
 
-使用Github手动下载或使用`git`克隆仓库。
+使用Github手动下载，或使用`git`来clone或fork仓库。
 
 ### 第二步：运行`server.py`文件
 
-该操作会在`localhost:50907`开放一个本地服务器，你可以根据自己的喜好更改端口号。
+进入项目根目录，在终端内执行`python server.py`
+该操作会在`localhost:50907`开放一个本地服务器；你也可以根据自己的喜好更改端口号。
 
 ### 第三步：访问本地服务器
 
