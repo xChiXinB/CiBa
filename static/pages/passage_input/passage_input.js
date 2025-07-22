@@ -39,3 +39,24 @@ function main() {
 }
 
 main();
+
+// demo
+const input = document.getElementById('input-box');
+let already = false;
+input.addEventListener('focus', () => {
+    if (already) {return;}
+    setTimeout(() => {
+        input.value = '';
+
+        const passage = 'Climate prediction accuracy remains a critical challenge in environmental science. This study examines machine learning integration into traditional climate modeling frameworks. Conventional physics-based models struggle with nonlinear climate dynamics and complex atmospheric interactions. Deep learning networks, particularly recurrent neural networks and transformer architectures, demonstrate superior performance in processing temporal climate data sequences. These models identify subtle patterns in temperature, precipitation, and atmospheric pressure variations that traditional methods overlook. Preliminary findings indicate hybrid models combining physics-based approaches with machine learning components achieve 15-20% improved accuracy in short-term weather forecasting. The integration of artificial intelligence into climate modeling represents significant advancement in predictive capabilities, offering enhanced understanding of environmental systems and improved forecasting precision for climate research applications.'
+        let counter = 0;
+        let timer = setInterval(() => {
+            input.value += passage.slice(counter, counter+10);
+            counter += 10;
+            if (counter>passage.length) {clearInterval(timer);}
+            input.dispatchEvent(new Event('input'));
+        }, 1)
+        
+        already = true;
+    }, 300)
+});
