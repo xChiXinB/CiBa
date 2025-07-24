@@ -12,6 +12,9 @@
 
         <!--左边栏-->
         <div class="left">
+            <button class="left-toggle-btn" aria-label="折叠/展开侧边栏" style="position: absolute; right: 15px; top: 15px; width: 30px; height: 30px; background: none; border: none; padding: 0; cursor: pointer; z-index: 10;">
+                <img src="/static/images/menu.png" alt="菜单" style="width: 30px; height: 30px; pointer-events: none;" />
+            </button>
             <p class="title">录入单词</p>
             <div style="height: 30px;"></div>
             <input type="text" placeholder="请输入你的单词" class="input-word" id="input-box">
@@ -26,9 +29,6 @@
                 <button type="button" class="left-buttons" style="background-color: cyan; display: none;">开始背诵</button>
             </div>
         </div>
-
-        <!--弥补left绝对定位的宽度-->
-        <div style="width: 25%; height: 0px;"></div>
 
         <!--词表部分-->
         <div class="content">
@@ -55,6 +55,8 @@
 
         <!--通知部分-->
         <div class="notifications-container" id="notifications-container"></div>
+        <!--遮罩-->
+        <div class="sidebar-mask" style="pointer-events: none;"></div>
     </div>
 
     <script src="{{ url_for('static', filename='xlsx.full.min.js') }}"></script>

@@ -191,30 +191,21 @@ class Renderer {
         notification_list.forEach((value, key, parent) => {
             // 获取这个通知的id
             const id = value.id
-            console.group(id);
             // 根据通知的新旧程度进行不同操作
             if (key === parent.length - 1) {
-                console.log('新通知');
                 // 新通知
                 // 添加动画
                 const final_opacity = this.notificationsData[id].opacity;
-                console.log('应该把透明度设置为：');
-                console.log(final_opacity);
                 const { keyframes, options } = this.getAnimation(id, final_opacity, 0);
-                console.log(keyframes);
-                console.log(options);
                 this.notificationsData[id].animation = value.animate(keyframes, options);
                 // 添加事件监视器
                 this.notificationsData[id].animation.addEventListener('finish', () => {
                     // 注意动画可能已经被删除
-                    console.log('这个动画似乎结束了');
                     this.notificationsData[id]?.animation.commitStyles();
                     this.notificationsData[id]?.animation.cancel();
                 });
-                console.log('设置了删除timeout');
                 this.delayedNotificationClear(id, true)
             } else {
-                console.log('旧通知');
                 // 旧通知
                 // 降低透明度
                 let opacity = this.notificationsData[id].opacity;
@@ -245,7 +236,6 @@ class Renderer {
                     }
                 });
             }
-            console.groupEnd(id)
         });
     }
 
@@ -299,7 +289,6 @@ class Renderer {
         const keyframe1 = {};
         const keyframe2 = {};
         // 从现在的transform开始
-        console.log(id);
         keyframe1.transform = getComputedStyle(document.getElementById(id))
             .getPropertyValue('transform');
         keyframe2.opacity = final_opacity;
@@ -334,15 +323,10 @@ class Renderer {
     }
 
     getTranslateY(id) {
-        console.group('获取tY');
         // 获取一个元素的TranslateY
         const targetNotification = document.getElementById(id);
-        console.log(
-            getComputedStyle(targetNotification).getPropertyValue('transform')
-        );
         const transform = getComputedStyle(targetNotification).getPropertyValue('transform')
             .match(/[+-]?\d+(\.\d+)?/g);
-        console.groupEnd('获取tY');
         return Number(
             transform[transform.length - 1]
         );
