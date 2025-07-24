@@ -101,7 +101,7 @@ export class LeftSidebarAnimator {
             })
         );
         // 按钮旋转动画
-        const btnAnim = this.toggle_button.animate([
+        const btnAnim = this.toggle_button.querySelector('img').animate([
             { transform: `rotate(${from * -180}deg)` },
             { transform: `${to === 1 ? 'rotate(-180deg)' : 'rotate(0deg)'}` }
         ], {
