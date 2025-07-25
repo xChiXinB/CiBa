@@ -72,7 +72,6 @@ export class LeftSidebarAnimator {
                 });
             }
             delete this.animations.sidebar;
-            console.log('取消并删除了animations.sidebar!');
         } else {
             from = (targetState === 'collapsed') ? 0 : 1;
         }
@@ -111,11 +110,9 @@ export class LeftSidebarAnimator {
         });
         // 统一存入动画状态，便于打断和判断
         this.animations.sidebar = [sidebarAnim, ...childrenAnims, btnAnim];
-        console.log('加入了animations.sidebar');
         sidebarAnim.onfinish = () => {
             // 动画结束后及时清理状态
             delete this.animations.sidebar;
-            console.log('删除了animations.sidebar!');
             this.sidebar_status = (targetState === 'collapsed') ? 'collapsed' : 'extended';
         };
     }
@@ -164,7 +161,6 @@ export class LeftSidebarAnimator {
      * @param {boolean} fromCurrent 是否从当前位置出发
      */
     animateMask(targetVisibility, fromCurrent = false) {
-        console.log(`遮罩开动了，我需要被看见吗？${targetVisibility}`);
         let from, to;
         // 计算from和to
         if (fromCurrent) {

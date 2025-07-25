@@ -46,10 +46,9 @@ class App {
         // 监听提交单词行为
         console.log('Running in progress!');
         this.ueh.vocabSubmitService(this.dm, this.r, this.nm);
-        // 保存按钮功能运行
-        // 清空按钮功能运行
+        // 按钮功能运行
         console.log('Button function activated!');
-        this.ueh.buttonServices(this.dm, this.r, this.nm);
+        this.ueh.buttonServices(this.dm, this.r);
         // 文章录入功能运行
         console.log('Import from passage activated!');
         this.ueh.listenPassageInput(this.dm, this.r, this.nm);

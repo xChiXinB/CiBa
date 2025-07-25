@@ -5,6 +5,8 @@ class UserEventHandler {
         this.clear = document.getElementById('clear');
         this.save = document.getElementById('save');
         this.passage_input_btn = document.getElementById('passage-input-btn');
+        // 新增：用于记录passage-input子窗口引用
+        this.passageInputWindow = undefined;
     }
 
     vocabSubmitService(DataManager, Renderer, NetworkManager) {
@@ -13,7 +15,7 @@ class UserEventHandler {
         this.listenEnterKey(DataManager, Renderer, NetworkManager);
     }
 
-    buttonServices(DataManager, Renderer, NetworkManager) {
+    buttonServices(DataManager, Renderer) {
         // 监听保存和清空按钮
         this.save.addEventListener('click', () => {
             this.btnSave(DataManager, Renderer);
@@ -66,6 +68,8 @@ class UserEventHandler {
         Renderer.disableAllBtn();
         // 4. 通知用户
         Renderer.notify('表格已被清空！');
+        // 清空后广播词表
+        this.broadcastInputWordList(DataManager);
     }
 
     listenShortcuts(DataManager, Renderer, NetworkManager) {
@@ -103,6 +107,8 @@ class UserEventHandler {
             Renderer.disableSaveBtn();
             // 新增单词数据（对应单词未查询完毕，false）
             DataManager.vocabulary[new_vocabulary] = false;
+            // 广播词表
+            this.broadcastInputWordList(DataManager);
             // 更新上次提交时间
             DataManager.lastSubmitTime = Date.now();
             // 新增一行表格，并获取返回的行和删除按钮的引用
@@ -201,21 +207,35 @@ class UserEventHandler {
             Renderer.removeIndex(row_index, DataManager);
             // 通知用户
             Renderer.notify(`已删除${vocab}。`);
+            // 删除后广播词表
+            this.broadcastInputWordList(DataManager);
         });
     }
 
     openPassageInput(Renderer) {
-        // 打开文章录入页面
-        const passageWindow = window.open('/passageinput', 'passage_input', 'width=800,height=600');
-        if (passageWindow) {
+        // 只允许打开一个passage-input子窗口
+        if (this.passageInputWindow !== undefined) {
+            Renderer.notify('请勿重复操作！');
+            return;
+        }
+        // 打开新窗口并保存引用
+        this.passageInputWindow = window.open('/passageinput', 'passage_input', 'width=800,height=600');
+        if (this.passageInputWindow) {
             Renderer.notify('已开启文章录入模式！');
+            // 监听窗口关闭事件，关闭时清空引用
+            const timer = setInterval(() => {
+                if (this.passageInputWindow.closed) {
+                    clearInterval(timer);
+                    this.passageInputWindow = undefined;
+                }
+            }, 500);
         }
     }
 
     listenPassageInput(DataManager, Renderer, NetworkManager) {
         // 监听来自passage-input页面的消息
         window.addEventListener('message', async (event) => {
-            if (event.data && event.data.type === 'word_click') {
+            if (event.data.type === 'word_click') {
                 const word = event.data.word;
                 // 模拟输入框输入单词
                 this.input_box.value = word;
@@ -224,8 +244,21 @@ class UserEventHandler {
                 if (success) {
                     Renderer.notify(`已录入文章中的${word}单词！`);
                 }
+            } else if (event.data.type === 'word_query') {
+                this.broadcastInputWordList(DataManager);
             }
         });
+    }
+
+    broadcastInputWordList(DataManager) {
+        // 利用localStorage广播词表
+        if (this.passageInputWindow === undefined) return;
+        const words = Object.keys(DataManager.vocabulary);
+        this.passageInputWindow.postMessage({
+            type: 'word_sync',
+            words: words,
+        }, '*');
+        console.log('已经发送消息了！');
     }
 }
 

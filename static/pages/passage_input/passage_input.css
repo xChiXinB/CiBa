@@ -60,20 +60,28 @@ body {
 }
 
 .passage-span {
-    color: #1e293b;
     font-size: xx-large;
+    color: #141414;
+    border-radius: 10px;
+    transition: background-color 0.3s ease 0s;
 }
 
 .passage-span-highlight {
-    background-color: #dbfaff;
     color: #1e40af;
-    transition: all 0.2s ease-in-out;
+    background-color: #dbfaff;
+}
+
+.existed-span-highlight {
+    color: #1e40af;
+    background-color: #FFF9C4;
 }
 
 .passage-span-highlight:hover {
-    background-color: #a8cfff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+    background-color: #A8CFFF; /* 淡蓝色 */
+}
+
+.existed-span-highlight:hover {
+    background-color: #ffef63;
 }
 
 /* @media (max-width: 900px) {

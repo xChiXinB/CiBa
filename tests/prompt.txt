@@ -128,3 +128,15 @@ when user clicks the button on the topright corner, or when user clicks the exis
         end if
     end if
 end when
+
+请你加入一个新功能：
+
+当input页面的单词列表变化时（加入、删除、清空），通知打开的passage-input窗口（如果有）。
+passage-input窗口将文章中存在于input词表的单词渲染成用户悬浮该单词相同的效果，除了背景颜色变为淡黄色。
+当然，不再存在于input词表的，但仍然是淡黄色的单词，恢复正常视觉效果。
+
+如果你看懂了，就输出你的方案。
+回复格式用 Markdown 分节，待我审核后才允许更改代码！
+必须做的事情：
+- 遵守现在的OOP代码风格（依赖注入）
+- 使用十六进制颜色时，请用括号描述其颜色！例如#2BC016（鲜艳的绿色）
