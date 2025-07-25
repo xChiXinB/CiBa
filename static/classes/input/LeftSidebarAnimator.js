@@ -3,7 +3,7 @@
 // 动画彻底解耦，支持用户意愿与自动响应分离
 // 动画状态管理与打断机制均有详细注释
 
-export class LeftSidebarAnimator {
+class LeftSidebarAnimator {
     constructor() {
         // 获取DOM元素
         this.left_sidebar = document.querySelector('.left');
@@ -15,7 +15,6 @@ export class LeftSidebarAnimator {
         // 配置信息
         this.duration = 500; // 动画时长（ms）
         this.userCollapsed = false; // 用户主动折叠意愿
-        this.floating = false; // 是否悬浮模式
         // 动画状态统一管理，键为模块名，值为动画（数组）
         this.animations = {
             sidebar: undefined,
@@ -213,6 +212,7 @@ export class LeftSidebarAnimator {
         this.lastIsLargeScreen = isLargeScreen;
 
         // 处理动画
+        // 注意此处逻辑比较复杂，略去注释！
         if (!isLargeScreen) {
             // 小屏
             if (!this.haveAnimation()) {
@@ -292,3 +292,5 @@ export class LeftSidebarAnimator {
         return have_animations;
     }
 }
+
+export {LeftSidebarAnimator};
