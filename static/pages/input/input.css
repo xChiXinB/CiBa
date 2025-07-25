@@ -1,7 +1,7 @@
 /*main.css*/
 
 .left {
-    width: 25%;
+    width: 400px;
     height: 100vh;
     background-color: #2563eb;
     position: fixed;
@@ -11,6 +11,56 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    transition: none; /* 动画由JS控制 */
+    will-change: transform;
+    z-index: 1001;
+}
+
+/* .left.floating {
+    z-index: 2000;
+    box-shadow: 2px 0 16px rgba(0,0,0,0.18);
+    /* 动画由JS控制 *
+}
+
+
+.left.collapsed {
+    transform: translateX(-340px);
+}
+
+@media (max-width: 700px) {
+    .left {
+        transform: translateX(-340px);
+    }
+    .content {
+        margin-left: 60px;
+    }
+} */
+
+
+.left-toggle-btn {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    width: 30px;
+    height: 30px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+.left-toggle-btn:hover {
+    transform: scale(1.15);
+}
+
+.left-toggle-btn img {
+    width: 30px;
+    height: 30px;
+    pointer-events: none;
+    transition: none;
+    will-change: transform;
 }
 
 .title {
@@ -21,10 +71,10 @@
 
 .input-word {
     text-align: center;
-    font-size: 1.5vw;
+    font-size: 30px;
     border-radius: 5px;
-    width: 50%;
-    height: 4%;
+    width: 250px;
+    height: 40px;
     border: 2px solid transparent;
     transition: all 0.2s ease-in-out;
 }
@@ -46,16 +96,16 @@
 
 .left-btn-grid {
     display: grid;
-    grid-template-columns: 50% 50%;
-    grid-template-rows: 7vh 7vh;
-    width: 80%;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 70px 70px;
+    width: 350px;
     justify-items: center;
 }
 
 .left-buttons {
-    width: 85%;
-    height: 5vh;
-    font-size: 1.7vw;
+    width: 150px;
+    height: 50px;
+    font-size: 25px;
     border-radius: 5px;
 }
 
@@ -70,13 +120,30 @@
 }
 
 .content {
-    width: 75%;
+    margin-left: 400px;
+    width: calc(100% - 400px);
     min-height: 100%;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: start;
+    transition: none;
+    will-change: margin-left, width;
 }
+
+
+/* @media (max-width: 700px) {
+    .left {
+        /* 兜底：小屏幕自动折叠 *
+        transform: translateX(-340px);
+    }
+    .content {
+        margin-left: 60px;
+        width: calc(100% - 60px);
+    }
+} */
+
 
 .word-table {
     width: 90%;
@@ -95,7 +162,7 @@
     font-size: 18px;
     width: 97%;
     height: 18px;
-    background-color: #f1f5f9;
+    /* 隐藏滑动条和边框，禁止调整大小 */
     overflow: hidden;
     resize: none;
     border: none;
@@ -132,10 +199,11 @@
 }
 
 .notifications-container {
-    position: fixed;
-    right: 27.5%;
-    bottom: 20vh;
-    width: 20%;
+    position: absolute;
+    left: 50%;
+    bottom: 190px;
+    transform: translateX(-50%);
+    width: 380px;
     display: flex;
     flex-direction: column;
 }
@@ -183,7 +251,7 @@
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    z-index: 1002;
     max-width: 300px;
     font-size: 14px;
     line-height: 1.4;
@@ -196,4 +264,16 @@
     height: auto;
     margin-top: 10px;
     border-radius: 4px;
+}
+
+.sidebar-mask {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.3);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.35s cubic-bezier(0.4,0,0.2,1);
 }

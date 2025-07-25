@@ -5,7 +5,7 @@ class EventPossessor {
         this.text_disassembly = this.is_start_with_vocab = null;
     }
 
-    passageInputService() {
+    passageInputService(Renderer) {
         console.log('passage service activated!');
         // 用户输入文章上传单词的服务
         this.input_box.addEventListener('input', () => {
@@ -28,23 +28,12 @@ class EventPossessor {
             }
             // 定义需要高亮的index % 2
             const highlighted_modular_res = this.is_start_with_vocab ? 0 : 1;
-            // 遍历单词，将它们渲染到页面上
-            this.text_disassembly.forEach((value, index) => {
-                // 创建DOM元素
-                const span = document.createElement('span')
-                span.classList.add('passage-span');
-                // 填充元素内容和高亮
-                span.textContent = value;
-                if (index % 2 === highlighted_modular_res) {
-                    span.classList.add('passage-span-highlight');
-                    // 为高亮的单词添加点击事件
-                    span.addEventListener('click', () => {
-                        this.handleWordClick(value);
-                    });
-                }
-                // 放置元素
-                this.passage_display.appendChild(span);
-            });
+            // 渲染文章到页面上
+            Renderer.renderPassage(
+                this.text_disassembly,
+                highlighted_modular_res,
+                this.handleWordClick
+            );
         });
     }
 
@@ -65,13 +54,30 @@ class EventPossessor {
 
     handleWordClick(word) {
         // 处理单词点击事件
-        if (window.opener) {
-            // 向input页面发送消息
-            window.opener.postMessage({
-                type: 'word_click',
-                word: word
-            }, '*');
-        }
+        // 向input页面发送消息
+        window.opener.postMessage({
+            type: 'word_click',
+            word: word
+        }, '*');
+    }
+
+    queryExistedWords() {
+        // 主动请求存在单词列表
+        window.opener.postMessage({
+            type: 'word_query',
+        }, '*');
+    }
+
+    messageReceiveService(Renderer) {
+        // 接受同步input页面的单词信息
+        console.log('Message Receiver Activated!');
+        window.addEventListener('message', (event) => {
+            console.log('接收到新的单词列表了');
+            if (event.data.type === 'word_sync') {
+                Renderer.existed_words = event.data.words;
+                Renderer.highlightExistedWords();
+            }
+        });
     }
 }
 
