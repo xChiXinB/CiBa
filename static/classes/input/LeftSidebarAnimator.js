@@ -1,7 +1,4 @@
 // LeftSidebarAnimator.js
-// 侧边栏动画与响应式控制类
-// 动画彻底解耦，支持用户意愿与自动响应分离
-// 动画状态管理与打断机制均有详细注释
 
 class LeftSidebarAnimator {
     constructor() {

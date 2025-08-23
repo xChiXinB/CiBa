@@ -144,8 +144,14 @@ class UserEventHandler {
 
     canSubmitNow(DataManager, Renderer, ignoreFocus=false) {
         // 检测是否可以提交单词
-        // 焦点不在输入框，且ignoreFocus为假
-        if ((document.activeElement !== this.input_box) && !ignoreFocus) {
+        // 判断焦点是否在输入框问题
+        let isFocusOK;
+        if (ignoreFocus) {
+            isFocusOK = true;
+        } else {
+            isFocusOK = document.activeElement === this.input_box;
+        }
+        if (!isFocusOK) {
             return false;
         }
         // 输入为空
@@ -220,16 +226,14 @@ class UserEventHandler {
         }
         // 打开新窗口并保存引用
         this.passageInputWindow = window.open('/passageinput', 'passage_input', 'width=800,height=600');
-        if (this.passageInputWindow) {
-            Renderer.notify('已开启文章录入模式！');
-            // 监听窗口关闭事件，关闭时清空引用
-            const timer = setInterval(() => {
-                if (this.passageInputWindow.closed) {
-                    clearInterval(timer);
-                    this.passageInputWindow = undefined;
-                }
-            }, 500);
-        }
+        Renderer.notify('已开启文章录入模式！');
+        // 监听窗口关闭事件，关闭时清空引用
+        const timer = setInterval(() => {
+            if (this.passageInputWindow.closed) {
+                clearInterval(timer);
+                this.passageInputWindow = undefined;
+            }
+        }, 500);
     }
 
     listenPassageInput(DataManager, Renderer, NetworkManager) {
