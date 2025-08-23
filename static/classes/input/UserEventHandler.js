@@ -48,7 +48,7 @@ class UserEventHandler {
         const name = `生词记录 ${new Date().toString()}.xlsx`;
         XLSX.writeFile(workbook, name);
         // 3. 提醒用户导出成功
-        this.r.notify('已保存表格到本地！');
+        Renderer.notify('已保存表格到本地！');
         // 4. 清空表格
         this.btnClear(DataManager, Renderer);
         // 5. 补回“操作”
@@ -251,7 +251,7 @@ class UserEventHandler {
     }
 
     broadcastInputWordList(DataManager) {
-        // 利用localStorage广播词表
+        // 广播词表
         if (this.passageInputWindow === undefined) return;
         const words = Object.keys(DataManager.vocabulary);
         this.passageInputWindow.postMessage({
