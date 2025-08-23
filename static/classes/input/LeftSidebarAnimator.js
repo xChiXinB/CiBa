@@ -10,7 +10,7 @@ class LeftSidebarAnimator {
         this.mask = document.querySelector('.sidebar-mask');
 
         // 配置信息
-        this.duration = 500; // 动画时长（ms）
+        this.duration = 5000; // 动画时长（ms）
         this.userCollapsed = false; // 用户主动折叠意愿
         // 动画状态统一管理，键为模块名，值为动画（数组）
         this.animations = {
@@ -37,7 +37,7 @@ class LeftSidebarAnimator {
             this.handleUserToggle();
         });
         window.addEventListener('keydown', (event) => {
-            if (event.code = 'Escape') {
+            if (event.code === 'Escape') {
                 this.handleEscape();
             }
         })
