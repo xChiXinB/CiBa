@@ -9,6 +9,10 @@ class UserEventHandler {
         this.passageInputWindow = undefined;
     }
 
+    inputBoxFocus() {
+        this.input_box.focus();
+    }
+
     vocabSubmitService(DataManager, Renderer, NetworkManager) {
         // 监听提交单词行为
         this.listenShortcuts(DataManager, Renderer, NetworkManager);

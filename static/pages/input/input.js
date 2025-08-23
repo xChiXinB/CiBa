@@ -37,6 +37,8 @@ class App {
         // 监听窗口变动
         console.log('Resizing listening in progress!');
         this.r.translationAutoHeight();
+        // 输入框聚焦
+        this.ueh.inputBoxFocus();
         // 禁用全部按钮
         console.log('Button disabled!');
         this.r.disableAllBtn();
