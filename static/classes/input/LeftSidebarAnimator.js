@@ -29,13 +29,18 @@ class LeftSidebarAnimator {
      * 入口初始化，绑定按钮和resize事件
      */
     initialize() {
-        // 按钮和遮罩
+        // 按钮，遮罩和Esc键
         this.toggle_button.addEventListener('click', () => {
             this.handleUserToggle();
         });
         this.mask.addEventListener('click', () => {
             this.handleUserToggle();
         });
+        window.addEventListener('keydown', (event) => {
+            if (event.code = 'Escape') {
+                this.handleEscape();
+            }
+        })
 
         // 宽口宽度变化
         window.addEventListener('resize', () => {
@@ -251,8 +256,14 @@ class LeftSidebarAnimator {
     /**
      * 响应用户点击按钮或遮罩，按状态机调度动画
      */
-    handleUserToggle() {
-        if (this.sidebar_status === 'collapsed' || this.sidebar_status === 'collapsing') {
+    handleUserToggle(is_sidebar_extend = undefined) {
+        let is_sidebar_collapse;
+        if (is_sidebar_extend) {
+            is_sidebar_collapse = false
+        } else {
+            is_sidebar_collapse = this.sidebar_status === 'collapsed' || this.sidebar_status === 'collapsing';
+        }
+        if (is_sidebar_collapse) {
             // 边栏已折叠或正在折叠
             this.animateSidebar('expanded', true);
             if (window.innerWidth > 1200) {
@@ -273,6 +284,13 @@ class LeftSidebarAnimator {
                 this.userCollapsed = true;
             }
         }
+    }
+
+    handleEscape() {
+        // 处理用户按下Esc键
+        if (this.sidebar_status === 'collapsed' || this.sidebar_status === 'collapsing') return;
+        if (this.lastIsLargeScreen) return;
+        this.handleUserToggle(true);
     }
 
     haveAnimation() {

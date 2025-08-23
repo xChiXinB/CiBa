@@ -145,13 +145,13 @@ class UserEventHandler {
     canSubmitNow(DataManager, Renderer, ignoreFocus=false) {
         // 检测是否可以提交单词
         // 判断焦点是否在输入框问题
-        let isFocusOK;
+        let is_focus_oK;
         if (ignoreFocus) {
-            isFocusOK = true;
+            is_focus_oK = true;
         } else {
-            isFocusOK = document.activeElement === this.input_box;
+            is_focus_oK = document.activeElement === this.input_box;
         }
-        if (!isFocusOK) {
+        if (!is_focus_oK) {
             return false;
         }
         // 输入为空
