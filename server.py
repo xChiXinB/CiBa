@@ -78,12 +78,4 @@ def home():
 def passage_input():
     return flask.render_template('passage_input.html')
 
-@app.route('/parent')
-def parent():
-    return flask.render_template('parent.html')
-
-@app.route('/children')
-def children():
-    return flask.render_template('children.html')
-
-app.run(host='0.0.0.0', port=50907, debug=True)
+app.run(host='0.0.0.0', port=50907, debug=False)
