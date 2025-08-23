@@ -7,10 +7,11 @@ class LeftSidebarAnimator {
         this.content = document.querySelector('.content');
         this.toggle_button = this.left_sidebar.querySelector('.left-toggle-btn');
         this.children = Array.from(this.left_sidebar.children).filter(e => !e.classList.contains('left-toggle-btn'));
+        this.input_box = document.getElementById('input-box');
         this.mask = document.querySelector('.sidebar-mask');
 
         // 配置信息
-        this.duration = 5000; // 动画时长（ms）
+        this.duration = 500; // 动画时长（ms）
         this.userCollapsed = false; // 用户主动折叠意愿
         // 动画状态统一管理，键为模块名，值为动画（数组）
         this.animations = {
@@ -116,6 +117,10 @@ class LeftSidebarAnimator {
             delete this.animations.sidebar;
             this.sidebar_status = (targetState === 'collapsed') ? 'collapsed' : 'extended';
         };
+
+        if (targetState === 'expanded') {
+            this.input_box.focus();
+        }
     }
 
     /**
