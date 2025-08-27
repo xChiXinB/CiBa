@@ -57,12 +57,17 @@ class App {
         // 侧边栏动画初始化
         this.lsa.initialize();
     }
+
+    test() {
+        this.dm.test();
+    }
 }
 
 // 定义主程序
 function main() {
     const app = new App(UEH, R, NM, DM, LSA);
     app.run();
+    app.test();
 }
 
 // 运行

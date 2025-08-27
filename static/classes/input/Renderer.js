@@ -42,12 +42,12 @@ class Renderer {
             // 如果resize过于频繁，就不会更改高度
             clearTimeout(this.auto_height_timeout);
             this.auto_height_timeout = setTimeout(() => {
-                // 遍历table，给其中的每一个textarea加上input事件
+                // 遍历table，给其中的每一个textarea重新计算行高
                 for (let i = 1; i < this.table.rows.length; i++) {
-                    this.table
-                        .rows[i].cells[2]
-                        .querySelector('.translation-input')
-                        .dispatchEvent(new Event('input'));
+                    const translation = this.table.rows[i]
+                        .getElementsByClassName('translation-input')[0]
+                    translation.style.height = '';
+                    translation.style.height = `${translation.scrollHeight}px`;
                 }
             }, 250); // resize不再触发250ms后，更改高度
         });
@@ -86,12 +86,11 @@ class Renderer {
 
     tryEnableSaveBtn(DataManager) {
         // 尝试启用保存按钮
-        if (Object
-                .values(DataManager.vocabulary)
-                .indexOf(false) === -1 && 
-            Object
-                .keys(DataManager.vocabulary)
-                .length > 0) {
+        const are_all_vocabs_translated = !(Array.from(
+            DataManager.vocabulary.values()
+        ).includes(false));
+        const has_translated_vocabs = DataManager.vocabulary.size > 0;
+        if (are_all_vocabs_translated && has_translated_vocabs) {
             // 有词汇，且词汇全部查询完毕
             this.save.disabled = false;
         }
@@ -100,6 +99,7 @@ class Renderer {
     insertCompleteRow(new_vocabulary) {
         // 插入表格新的一行
         const new_row = this.table.tBodies[0].insertRow(-1);
+        new_row.classList.add('table-row');
         // 补全表格cell
         for (let i = 0; i < 4; i++) {
             const cell = new_row.insertCell(-1);
@@ -143,10 +143,11 @@ class Renderer {
             behavior: 'smooth',
             block: 'end',
         });
-        // 自适应行高
+        // 自适应行高，修改时移除异常状态
         translation.addEventListener('input', () => {
             translation.style.height = '';
             translation.style.height = `${translation.scrollHeight}px`;
+            translation.closest('tr').style.backgroundColor = '#00000000';
         });
         return {
             delete_btn: delete_btn
@@ -156,8 +157,7 @@ class Renderer {
     addTranslation(row, translation) {
         // 补充单词的翻译信息
         const translation_textarea = row // 这一行
-        .cells[2] // 的第二列
-        .querySelector('.translation-input'); // 的输入框
+        .getElementsByClassName('translation-input')[0] // 的输入框
         // 补充翻译的信息
         translation_textarea.value = translation; // 的值
         // 调整行高
@@ -169,9 +169,33 @@ class Renderer {
         });
     }
 
+    refreshTableColor(DataManager) {
+        // 如果有单词出错了，就把表格变红色
+        console.log(DataManager);
+        // 初始化
+        for (const row of this.table.rows) {
+            row.style.backgroundColor = '#00000000';
+        }
+
+        Array.from(
+            DataManager.vocabulary.keys()
+        ).filter((word) => 
+            DataManager.vocabulary.get(word) === 'errored'
+        ).forEach((errored_word) => {
+            const index_of_errored_word = Array.from(
+                DataManager.vocabulary.keys()
+            ).indexOf(errored_word) + 1;
+            this.table.rows[index_of_errored_word].style.backgroundColor = '#ff000020';
+        });
+    }
+
     removeIndex(row_index, DataManager) {
         // 删除表格的某一行
         this.table.deleteRow(row_index);
+        // 序号重排
+        for (let i = row_index; i < this.table.rows.length; i++) {
+            this.table.rows[i].cells[0].textContent = i;
+        }
         // 如果不剩单词，就禁用所有按钮
         if (this.table.rows.length === 1) {
             this.disableAllBtn();

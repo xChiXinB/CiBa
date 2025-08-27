@@ -158,7 +158,7 @@
 }
 
 .translation-input {
-    background-color: #e2fbff;
+    background-color: #00000000;
     color: #1e293b;
     font-size: 18px;
     width: 97%;
@@ -169,8 +169,12 @@
     border: none;
 }
 
+.table-row {
+    transition: background-color 500ms ease-in-out 0ms;
+}
+
 .table-data {
-    color: #1e293b;
+    color: #1e293b; /* 文字颜色 */
     text-align: center;
     vertical-align: middle;
     font-size: 18px;
@@ -197,6 +201,7 @@
 .operations {
     height: 18px;
     width: 18px;
+    transition: background-color 200ms ease-in-out 0ms;
 }
 
 .notifications-container {

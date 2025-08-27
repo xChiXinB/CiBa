@@ -120,6 +120,9 @@ class LeftSidebarAnimator {
 
         if (targetState === 'expanded') {
             this.input_box.focus();
+        } else {
+            this.input_box.value = '';
+            this.input_box.blur();
         }
     }
 

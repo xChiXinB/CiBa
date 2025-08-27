@@ -1,3 +1,3 @@
 start http://localhost:50907/input
-python server.py
+start python server.py
 exit
