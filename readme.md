@@ -16,7 +16,7 @@
 
 ## 环境配置
 - Python 3
-- Python依赖库：`pip install flask flask_cors requests bs4`
+- Python依赖库：`pip install flask flask_cors`
 
 ## 运行操作
 

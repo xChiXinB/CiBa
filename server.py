@@ -1,7 +1,5 @@
 import flask
 import flask_cors
-import requests
-from bs4 import BeautifulSoup
 # 第三方库
 from ECDICT_resources.stardict import DictCsv
 
