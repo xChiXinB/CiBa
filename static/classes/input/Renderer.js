@@ -143,11 +143,17 @@ class Renderer {
             behavior: 'smooth',
             block: 'end',
         });
-        // 自适应行高，修改时移除异常状态
+        // 自适应行高，修改时移除异常状态，删除重试按钮
         translation.addEventListener('input', () => {
             translation.style.height = '';
             translation.style.height = `${translation.scrollHeight}px`;
             translation.closest('tr').style.backgroundColor = '#00000000';
+
+            Array.from(
+                translation.closest('tr').getElementsByClassName('operations')
+            ).find((element) => 
+                element.src.includes('retry.png')
+            ).remove();
         });
         return {
             delete_btn: delete_btn

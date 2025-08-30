@@ -11,8 +11,12 @@ class UserEventHandler {
         this.retry_target = null;
     }
 
-    inputBoxFocus() {
+    inputBoxAutoFocus() {
         this.input_box.focus();
+        
+        window.addEventListener('focus', () => {
+            this.input_box.focus();
+        });
     }
 
     vocabSubmitService(DataManager, Renderer, NetworkManager) {
@@ -284,7 +288,7 @@ class UserEventHandler {
                 .closest('tr')
                 .getElementsByClassName('operations')
         ).find((element) => 
-            element.src.includes('/static/images/retry.png')
+            element.src.includes('retry.png')
         ).remove();
 
         // 恢复输入框内容
