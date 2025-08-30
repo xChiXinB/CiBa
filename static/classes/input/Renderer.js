@@ -108,7 +108,7 @@ class Renderer {
         // 加入表格细节
         const { delete_btn } = this.modifyRow(new_row, new_vocabulary);
         return {
-            new_row: new_row,
+            new_row_private: new_row,
             delete_btn: delete_btn,
         };
     }
@@ -169,8 +169,8 @@ class Renderer {
         });
     }
 
-    refreshTableColor(DataManager) {
-        // 如果有单词出错了，就把表格变红色
+    refreshTableStatus(DataManager, deleteBtnReactions) {
+        // 如果有单词出错了，就把表格变红色，且添加重试按钮
         console.log(DataManager);
         // 初始化
         for (const row of this.table.rows) {
@@ -185,7 +185,19 @@ class Renderer {
             const index_of_errored_word = Array.from(
                 DataManager.vocabulary.keys()
             ).indexOf(errored_word) + 1;
-            this.table.rows[index_of_errored_word].style.backgroundColor = '#ff000020';
+            const errored_row = this.table.rows[index_of_errored_word];
+
+            errored_row.style.backgroundColor = '#ff000020';
+            
+            const retry_btn = document.createElement('img');
+            retry_btn.src = './static/images/retry.png';
+            retry_btn.classList.add('operations');
+            errored_row.getElementsByClassName(
+                'operations-container'
+            )[0].appendChild(retry_btn);
+            retry_btn.addEventListener('mouseover', () => {deleteBtnReactions.mouseover(retry_btn);});
+            retry_btn.addEventListener('mouseleave', () => {deleteBtnReactions.mouseleave(retry_btn);});
+            retry_btn.addEventListener('click', () => {deleteBtnReactions.click(this, retry_btn);});
         });
     }
 
@@ -326,15 +338,15 @@ class Renderer {
         };
     }
 
-    delayedNotificationClear(id, displayAnimation) {
+    delayedNotificationClear(id, displayRemovalAnimation) {
         // 移除一个通知
         const targetNotification = document.getElementById(id);
         // 计算timeout时间
-        const delayTime = displayAnimation ? this.notification_clear_delay : 0;
-        const removeDelayTime = displayAnimation ? this.animations_length : 0;
+        const delayTime = displayRemovalAnimation ? this.notification_clear_delay : 0;
+        const removeDelayTime = displayRemovalAnimation ? this.animations_length : 0;
 
         setTimeout(() => {
-            if (displayAnimation) {
+            if (displayRemovalAnimation) {
                 // 播放出场动画
                 const { keyframes, options } = this.getAnimation(id, 0, 40)
                 targetNotification.animate(keyframes, options);
