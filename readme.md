@@ -31,3 +31,16 @@
 ### 第三步：关闭软件
 
 如果你想结束词霸的运行，来到`ciba.cmd`文件弹出的命令行窗口，按下Ctrl+C即可。
+
+# 第三方声明
+
+本项目包含了以下第三方项目的部分代码：
+
+## ECDICT
+
+- 仓库链接：[https://github.com/skywind3000/ECDICT](https://github.com/skywind3000/ECDICT)
+- 提交： bc015ed (Mar 28, 2025)
+- 版权： (c) 2025 Linwei
+- 许可证： MIT许可证
+- 备注：该仓库的原始文件没有被修改。
+- 请在 `licenses/skywind3000-ECDICT-MIT.txt` 查看完整的许可证内容。

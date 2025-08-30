@@ -123,9 +123,9 @@ class UserEventHandler {
             vocab_row = new_row_private; // 变量作用到外层块
             // 监听删除按钮
             this.listenDeleteBtn(delete_btn, DataManager, Renderer);
-            // 清空输入框
-            this.input_box.value = '';
         }
+        // 清空输入框
+        this.input_box.value = '';
         // 禁用保存按钮
         Renderer.disableSaveBtn();
         // 设定单词数据（对应单词未查询完毕，false）
