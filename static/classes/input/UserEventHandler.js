@@ -136,8 +136,6 @@ class UserEventHandler {
         DataManager.vocabulary.set(new_vocabulary, false);
         // 广播词表
         this.broadcastInputWordList(DataManager);
-        // 更新上次提交时间
-        DataManager.lastSubmitTime = Date.now();
         // fetch释义数据
         let is_fetch_successful;
         try {
@@ -202,11 +200,6 @@ class UserEventHandler {
                     : translation
                 }`
             );
-            return false;
-        }
-        // 输入过于频繁（小于2秒）
-        if (Date.now() - DataManager.lastSubmitTime <= 2000) {
-            Renderer.notify('操作过于频繁，请稍后再试。');
             return false;
         }
         return new_vocabulary;

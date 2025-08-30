@@ -10,7 +10,6 @@ class DataManager {
             // undefined （不存在）；
             // 'errored' （出现错误）；
         );
-        this.lastSubmitTime = 0;
     }
 
     test() {
