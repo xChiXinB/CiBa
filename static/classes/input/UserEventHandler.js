@@ -11,6 +11,15 @@ class UserEventHandler {
         this.retry_target = null;
     }
 
+    preventUnload() {
+        window.addEventListener('beforeunload', (sth) => {
+            if (this.table.rows.length <= 1) return;
+            sth.preventDefault();
+            sth.returnValue = '';
+            return;
+        });
+    }
+
     inputBoxAutoFocus() {
         this.input_box.focus();
         

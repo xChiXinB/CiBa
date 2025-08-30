@@ -34,6 +34,8 @@ class App {
 
     run() {
         // 应用运行主程序
+        // 离开提示
+        this.ueh.preventUnload();
         // 监听窗口变动
         console.log('Resizing listening in progress!');
         this.r.translationAutoHeight();
