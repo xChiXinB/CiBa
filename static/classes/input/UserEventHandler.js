@@ -188,7 +188,7 @@ class UserEventHandler {
             return false;
         }
         // 输入为空
-        const new_vocabulary = this.input_box.value;
+        const new_vocabulary = this.input_box.value.toLowerCase();
         if (new_vocabulary === '') {
             return false;
         }
