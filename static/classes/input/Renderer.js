@@ -86,17 +86,15 @@ class Renderer {
 
     tryEnableSaveBtn(DataManager) {
         // 尝试启用保存按钮
-        const are_all_vocabs_translated = !(Array.from(
-            DataManager.vocabulary.values()
-        ).includes(false));
-        const has_translated_vocabs = DataManager.vocabulary.size > 0;
+        const are_all_vocabs_translated = DataManager.getRowsByOk('retry').length === 0;
+        const has_translated_vocabs = DataManager.getVocabListLength() > 0;
         if (are_all_vocabs_translated && has_translated_vocabs) {
             // 有词汇，且词汇全部查询完毕
             this.save.disabled = false;
         }
     }
 
-    insertCompleteRow(new_vocabulary) {
+    insertCompleteRow(DataManager, newVocabulary, deleteCallback, retryCallback) {
         // 插入表格新的一行
         const new_row = this.table.tBodies[0].insertRow(-1);
         new_row.classList.add('table-row');
@@ -106,14 +104,11 @@ class Renderer {
             cell.className = 'table-data';
         }
         // 加入表格细节
-        const { delete_btn } = this.modifyRow(new_row, new_vocabulary);
-        return {
-            new_row_private: new_row,
-            delete_btn: delete_btn,
-        };
+        this.modifyRow(DataManager, new_row, newVocabulary, deleteCallback, retryCallback);
+        return new_row;
     }
 
-    modifyRow(row, vocabulary) {
+    modifyRow(DataManager, row, vocabulary, deleteCallback, retryCallback) {
         // 添加新行的细节
         // 添加动画
         row.style.animation = 'opaquely-fade-in 0.5s ease';
@@ -136,28 +131,41 @@ class Renderer {
         // 添加操作按钮
         const delete_btn = document.createElement('img');
         delete_btn.src = './static/images/delete.png';
-        delete_btn.className = 'operations';
+        delete_btn.classList.add('operations');
         operations_container.appendChild(delete_btn);
+        const retry_btn = document.createElement('img');
+        retry_btn.src = './static/images/retry.png';
+        retry_btn.classList.add('operations');
+        retry_btn.style.display = 'none';
+        operations_container.appendChild(retry_btn);
+        this.addBtnEventListeners(DataManager, this, delete_btn, deleteCallback, retry_btn, retryCallback);
         // 将行滚动到视图
         translation.scrollIntoView({
             behavior: 'smooth',
             block: 'end',
         });
-        // 自适应行高，修改时移除异常状态，删除重试按钮
+        // 自适应行高，修改时移除异常状态
         translation.addEventListener('input', () => {
             translation.style.height = '';
             translation.style.height = `${translation.scrollHeight}px`;
-            translation.closest('tr').style.backgroundColor = '#00000000';
 
-            Array.from(
-                translation.closest('tr').getElementsByClassName('operations')
-            ).find((element) => 
-                element.src.includes('retry.png')
-            ).remove();
+            const row = translation.closest('tr');
+            row.style.backgroundColor = '#00000000';
+            row._ok = true;
+            const operations = Array.from(row.getElementsByClassName('operations'));
+            operations.find((element) =>
+                element.src.includes('retry')
+            ).style.display = 'none';
         });
-        return {
-            delete_btn: delete_btn
-        };
+    }
+
+    addBtnEventListeners(DataManager, Renderer, del, delE, rtr, rtrE) {
+        del.addEventListener('mouseover', () => {delE.mouseover(del);});
+        del.addEventListener('mouseleave', () => {delE.mouseleave(del);});
+        del.addEventListener('click', () => {delE.click(DataManager, Renderer, del);});
+        rtr.addEventListener('mouseover', () => {rtrE.mouseover(rtr);});
+        rtr.addEventListener('mouseleave', () => {rtrE.mouseleave(rtr);});
+        rtr.addEventListener('click', () => {rtrE.click(DataManager, Renderer, rtr);});
     }
 
     addTranslation(row, translation) {
@@ -167,7 +175,8 @@ class Renderer {
         // 补充翻译的信息
         translation_textarea.value = translation; // 的值
         // 调整行高
-        translation_textarea.dispatchEvent(new Event('input'));
+        translation_textarea.style.height = '';
+        translation_textarea.style.height = `${translation_textarea.scrollHeight}px`;
         // 将行滚动到视图
         translation_textarea.scrollIntoView({
             behavior: 'smooth',
@@ -175,35 +184,22 @@ class Renderer {
         });
     }
 
-    refreshTableStatus(DataManager, deleteBtnReactions) {
-        // 如果有单词出错了，就把表格变红色，且添加重试按钮
+    refreshTableStatus(DataManager) {
+        // 如果有单词出错了，就把表格变红色
         console.log(DataManager);
         // 初始化
         for (const row of this.table.rows) {
             row.style.backgroundColor = '#00000000';
         }
 
-        Array.from(
-            DataManager.vocabulary.keys()
-        ).filter((word) => 
-            DataManager.vocabulary.get(word) === 'errored'
-        ).forEach((errored_word) => {
-            const index_of_errored_word = Array.from(
-                DataManager.vocabulary.keys()
-            ).indexOf(errored_word) + 1;
-            const errored_row = this.table.rows[index_of_errored_word];
-
+        DataManager.getRowsByOk(false).forEach((errored_row) => {
             errored_row.style.backgroundColor = '#ff000020';
-            
-            const retry_btn = document.createElement('img');
-            retry_btn.src = './static/images/retry.png';
-            retry_btn.classList.add('operations');
-            errored_row.getElementsByClassName(
-                'operations-container'
-            )[0].appendChild(retry_btn);
-            retry_btn.addEventListener('mouseover', () => {deleteBtnReactions.mouseover(retry_btn);});
-            retry_btn.addEventListener('mouseleave', () => {deleteBtnReactions.mouseleave(retry_btn);});
-            retry_btn.addEventListener('click', () => {deleteBtnReactions.click(this, retry_btn);});
+            const operations = Array.from(
+                errored_row.getElementsByClassName('operations')
+            )
+            operations.find((element) =>
+                element.src.includes('retry')
+            ).style.display = '';
         });
     }
 

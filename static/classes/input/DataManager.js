@@ -1,49 +1,34 @@
 class DataManager {
     constructor() {
-        this.vocabulary = new Map(
-            // vocabulary: value,
-            // ......
-            //
-            // value可能的值：
-            // true（查询完毕）；
-            // false（未查询完毕）；
-            // undefined （不存在）；
-            // 'errored' （出现错误）；
-        );
+        this.table = document.getElementById('word-table');
     }
 
-    test() {
-        // 保存原始方法
-        const originalSet = Map.prototype.set;
-        const originalDelete = Map.prototype.delete;
-        const originalClear = Map.prototype.clear;
+    getRowElementByWord(word) {
+        const rows_of_array = Array.from(this.table.rows);
+        const row = rows_of_array.find((element) => {
+            return element.cells[1].textContent === word;
+        });
+        return row;
+    }
 
-        function logMap(map, action, key, value) {
-            const entries = Array.from(map.entries()).map(([k, v]) => ({ key: k, value: v }));
-            console.log(`Map ${action}${key !== undefined ? ` (key=${key}, value=${value})` : ""}`);
-            console.table(entries);
-        }
+    getRowsByOk(ok) {
+        const rows_of_array = Array.from(this.table.rows);
+        const rows = rows_of_array.filter((element) => 
+            element._ok === ok
+        );
+        return rows;
+    }
 
-        // 覆写 set
-        Map.prototype.set = function(key, value) {
-            const result = originalSet.call(this, key, value);
-            logMap(this, "set", key, value);
-            return result;
-        };
+    getVocabListLength() {
+        return this.table.rows.length - 1;
+    }
 
-        // 覆写 delete
-        Map.prototype.delete = function(key) {
-            const result = originalDelete.call(this, key);
-            logMap(this, "delete", key);
-            return result;
-        };
-
-        // 覆写 clear
-        Map.prototype.clear = function() {
-            const result = originalClear.call(this);
-            logMap(this, "clear");
-            return result;
-        };
+    getVocabList() {
+        const rows_of_array = Array.from(this.table.rows);
+        const list = rows_of_array.slice(1).map((row) => 
+            row.cells[1].textContent
+        );
+        return list;
     }
 }
 

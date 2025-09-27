@@ -61,7 +61,7 @@ class App {
     }
 
     test() {
-        this.dm.test();
+        window._data_manager = this.dm;
     }
 }
 

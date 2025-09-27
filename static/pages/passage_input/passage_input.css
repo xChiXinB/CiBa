@@ -57,6 +57,7 @@ body {
     width: 100%;
     min-height: 100%;
     padding: 0px 3% 0px 3%; /* 左右有边距，上下没有 */
+    margin-top: 100px;
 }
 
 .passage-span {

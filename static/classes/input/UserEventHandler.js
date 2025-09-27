@@ -7,8 +7,6 @@ class UserEventHandler {
         this.passage_input_btn = document.getElementById('passage-input-btn');
         // 新增：用于记录passage-input子窗口引用
         this.passageInputWindow = undefined;
-        // 是否有单词在重试
-        this.retry_target = null;
     }
 
     preventUnload() {
@@ -107,42 +105,35 @@ class UserEventHandler {
         // 监听用户使用Enter输入单词
         console.log('Listening Enter');
         const enter_callback = (res) => {
-            if (res.key === 'Enter') {
-                if (this.retry_target !== null) {
-                    this.doRetry(DataManager, Renderer, NetworkManager);
-                    return;
-                }
-                this.submitVocab(DataManager, Renderer, NetworkManager);
-                
+            if (res.key !== 'Enter') return;
+            if (DataManager.getRowsByOk('retry').length !== 0) {
+                this.doRetry(DataManager, Renderer, NetworkManager);
+                return;
             }
+            this.submitVocab(DataManager, Renderer, NetworkManager);
         }
         document.addEventListener('keydown', enter_callback);
     }
 
     async submitVocab(DataManager, Renderer, NetworkManager, ignoreFocus=false, isRetry=false) {
         // 提交单词
-        const new_vocabulary = this.canSubmitNow(DataManager, Renderer, ignoreFocus);
+        const new_vocabulary = this.canSubmitNow(DataManager, Renderer, ignoreFocus, isRetry);
         // 检查提交条件，如果不能提交则new_vocabulary === false
         if (new_vocabulary === false) return false;
         let vocab_row;
         if (isRetry) {
             Renderer.notify(`正在重新提交${new_vocabulary}！`);
-            vocab_row = this.retry_target;
+            vocab_row = DataManager.getRowsByOk('retry')[0];
         } else {
             // 启用清空按钮
             Renderer.enableClearBtn();
-            // 新增一行表格，并获取返回的行和删除按钮的引用
-            const { new_row_private, delete_btn } = Renderer.insertCompleteRow(new_vocabulary);
-            vocab_row = new_row_private; // 变量作用到外层块
-            // 监听删除按钮
-            this.listenDeleteBtn(delete_btn, DataManager, Renderer);
+            // 新增一行表格
+            vocab_row = Renderer.insertCompleteRow(DataManager, new_vocabulary, this.listenDeleteBtn(), this.listenRetryBtn());
         }
         // 清空输入框
         this.input_box.value = '';
         // 禁用保存按钮
         Renderer.disableSaveBtn();
-        // 设定单词数据（对应单词未查询完毕，false）
-        DataManager.vocabulary.set(new_vocabulary, false);
         // 广播词表
         this.broadcastInputWordList(DataManager);
         // fetch释义数据
@@ -162,20 +153,15 @@ class UserEventHandler {
             is_fetch_successful = false;
             return is_fetch_successful; // 录入失败
         } finally {
-            const vocab_not_deleted = DataManager.vocabulary.get(new_vocabulary) !== undefined;
-            if (vocab_not_deleted && is_fetch_successful) {
-                DataManager.vocabulary.set(new_vocabulary, true);
-            } else if (vocab_not_deleted && (!is_fetch_successful)) {
-                DataManager.vocabulary.set(new_vocabulary, 'errored');
-            }
+            vocab_row._ok = is_fetch_successful;
             // 尝试解禁按钮
             Renderer.tryEnableSaveBtn(DataManager);
             // 刷新表格
-            Renderer.refreshTableStatus(DataManager, this.listenRetryBtn());
+            Renderer.refreshTableStatus(DataManager);
         }
     }
 
-    canSubmitNow(DataManager, Renderer, ignoreFocus=false) {
+    canSubmitNow(DataManager, Renderer, ignoreFocus=false, isRetry=false) {
         // 检测是否可以提交单词
         // 判断焦点是否在输入框问题
         let is_focus_oK;
@@ -193,15 +179,11 @@ class UserEventHandler {
             return false;
         }
         // 输入重复
-        if (DataManager.vocabulary.get(new_vocabulary) !== undefined) {
+        const row_of_word = DataManager.getRowElementByWord(new_vocabulary);
+        if ((row_of_word !== undefined) && !isRetry) {
             this.input_box.value = ''; // 清空输入框
-            // 获取单词释义并通知用户
-            const index_of_new_vocab = Array.from(
-                DataManager.vocabulary.keys()
-            ).indexOf(new_vocabulary) + 1;
-            const translation = this.table.rows[
-                index_of_new_vocab
-            ].getElementsByClassName('translation-input')[0].value;
+
+            const translation = row_of_word.cells[2].textContent;
             Renderer.notify(
                 `${new_vocabulary}重复！释义：
                 ${translation.length > 10
@@ -214,35 +196,35 @@ class UserEventHandler {
         return new_vocabulary;
     }
 
-    listenDeleteBtn(button, DataManager, Renderer) {
+    listenDeleteBtn() {
         // 绑定删除按钮的事件监视器
-        // 鼠标覆盖
-        button.addEventListener('mouseover', () => {
+        const mouseover = function(button) {
             button.style.backgroundColor = '#FF000050';
-        });
-        // 鼠标离开
-        button.addEventListener('mouseleave', () => {
+        };
+        const mouseleave = function(button) {
             button.style.backgroundColor = '#00000000';
-        });
-        // 鼠标点击
-        button.addEventListener('click', () => {
-            // 获取单词和单词索引
-            const row = button.closest('tr')
+        };
+        const click = (DataManager, Renderer, button) => {
+            const row = button.closest('tr');
             const row_index = row.rowIndex;
             let vocab = row.cells[1].textContent;
             if (vocab === '') {
                 vocab = row.cells[1]._textContent;
                 clearInterval(row.cells[1].getElementsByClassName('retry-input')[0]._intervalNotice);
             }
-            // 删除数据
-            DataManager.vocabulary.delete(vocab);
             // 删除表格该行
             Renderer.removeIndex(row_index, DataManager);
             // 通知用户
             Renderer.notify(`已删除${vocab}。`);
             // 删除后广播词表
             this.broadcastInputWordList(DataManager);
-        });
+        };
+        const functions = {
+            mouseover: mouseover,
+            mouseleave: mouseleave,
+            click: click,
+        };
+        return functions;
     }
 
     listenRetryBtn() {
@@ -252,22 +234,26 @@ class UserEventHandler {
         const mouseleave = function(button) {
             button.style.transform = 'rotate(0turn) scale(1)';
         };
-        const click = (Renderer, button) => {
-            if (this.retry_target) return;
-            this.retry_target = button.closest('tr');
+        const click = (DataManager, Renderer, button) => {
+            if (DataManager.getRowsByOk('retry').length !== 0) return;
 
-            const vocab_cell = this.retry_target.cells[1];
-            const vocab = vocab_cell.textContent;
-            Renderer.notify(`正在修改出错的单词 ${vocab}！`, true);
+            const retry_row = button.closest('tr');
+            retry_row._ok = 'retry';
+            console.log('retry_row', retry_row);
+            console.log('retry_row._ok', retry_row._ok);
+
+            const retry_cell = retry_row.cells[1];
+            const retry_vocab = retry_cell.textContent;
+            Renderer.notify(`正在修改出错的单词 ${retry_vocab}！`, true);
             Renderer.notify('按下Enter以尝试重新提交！', true);
 
             // 添加输入框
-            vocab_cell._textContent = vocab;
-            vocab_cell.textContent = '';
+            retry_cell._textContent = retry_vocab;
+            retry_cell.textContent = '';
             const retry_input = document.createElement('input');
             retry_input.classList.add('retry-input');
-            vocab_cell.appendChild(retry_input);
-            retry_input.value = vocab
+            retry_cell.appendChild(retry_input);
+            retry_input.value = retry_vocab;
             retry_input.focus();
 
             // 操作提醒
@@ -285,28 +271,27 @@ class UserEventHandler {
 
     async doRetry(DataManager, Renderer, NetworkManager) {
         // 删除重试按钮
-        Array.from(
-            document.getElementsByClassName('retry-input')[0]
-                .closest('tr')
-                .getElementsByClassName('operations')
-        ).find((element) => 
-            element.src.includes('retry.png')
-        ).remove();
+        const retry_row = DataManager.getRowsByOk('retry')[0];
+        const operations = Array.from(
+            retry_row.getElementsByClassName('operations')
+        );
+        operations.find((element) =>
+            element.src.includes('retry')
+        ).style.display = 'none';
 
         // 恢复输入框内容
-        const vocab_cell = this.retry_target.cells[1];
-        const retry_input = vocab_cell.getElementsByClassName('retry-input')[0];
-        this.input_box.value = vocab_cell.textContent = retry_input.value;
+        const retry_cell = retry_row.cells[1];
+        const retry_input = retry_cell.getElementsByClassName('retry-input')[0];
+        this.input_box.value = retry_cell.textContent = retry_input.value;
         clearInterval(retry_input._intervalNotice);
         retry_input.remove();
 
-        DataManager.vocabulary.delete(vocab_cell._textContent); 
-        Renderer.addTranslation(this.retry_target, '正在重试……');
+        Renderer.addTranslation(retry_row, '正在重试……');
 
         const success = await this.submitVocab(DataManager, Renderer, NetworkManager, true, true);
-        this.retry_target = null;
         if (success) {
-            Renderer.notify(`单词${vocab_cell.textContent}查询成功！`);
+            Renderer.notify(`单词${retry_cell.textContent}查询成功！`);
+            this.broadcastInputWordList(DataManager);
         }
     }
 
@@ -349,7 +334,7 @@ class UserEventHandler {
     broadcastInputWordList(DataManager) {
         // 广播词表
         if (this.passageInputWindow === undefined) return;
-        const words = Array.from(DataManager.vocabulary.keys());
+        const words = DataManager.getVocabList();
         this.passageInputWindow.postMessage({
             type: 'word_sync',
             words: words,

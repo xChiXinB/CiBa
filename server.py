@@ -30,4 +30,8 @@ def passage_input():
     return flask.render_template('passage_input.html')
 
 if __name__ == "__main__":
+    # 写入文件，为了让cmd检查到程序启动
+    with open("ok.txt", "w", encoding="utf-8") as signal_file:
+        signal_file.write("_")
+
     app.run(host='0.0.0.0', port=50907, debug=False)
